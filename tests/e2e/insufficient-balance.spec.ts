@@ -5,11 +5,14 @@ import { attachHud, attachJson, attachOcr, attachPng, attachSpin, hudValues } fr
 import { requireCreditAndBet } from '../../src/game/hud';
 import { watchSpin } from '../../src/game/spin-watcher';
 import { expect, test } from '../../src/fixtures';
+import { SCENARIOS } from '../../src/reporting/check-catalog';
 import { Checks } from '../../src/reporting/checks';
+
+const C = SCENARIOS.insufficientBalance.checks;
 
 test.use({ account: 'EMPTY' });
 
-test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
+test(SCENARIOS.insufficientBalance.title, async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
   const checks = new Checks(testInfo);
   const money = (cents: number | null | undefined) =>
     cents === null || cents === undefined ? 'not read' : formatMoney({ cents, currency: market.currency }, market.locale);
@@ -26,8 +29,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   const betssonBefore = await test.step('Read the Betsson balance before the attempt', () => balanceMenu.read());
   await attachPng(testInfo, 'Betsson balance before', betssonBefore.evidence);
   await checks.verify(
-    'S2-01',
-    'Betsson balance is shown in the market currency',
+    C.betssonCurrency,
     () => expect.soft(betssonBefore.withdrawable.currency).toBe(market.currency),
     `${money(betssonBefore.withdrawable.cents)} (expected ${market.currency})`,
   );
@@ -36,8 +38,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   const mode = await test.step('Enter Real Play', () => gamePage.ensureRealPlay());
   await attachJson(testInfo, 'Play mode', mode);
   await checks.verify(
-    'S2-02',
-    'Game runs in Real Play with the Pragmatic Play provider',
+    C.realPlay,
     () => {
       expect.soft(mode.real).toBe(true);
       expect.soft(mode.launcherProvider).toBe('PragmaticPlay');
@@ -49,8 +50,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   await attachHud(testInfo, 'HUD before attempt', before, await gamePage.capture());
   const { credit, bet } = requireCreditAndBet(before);
   await checks.verify(
-    'S2-03',
-    'In-game credit and wager are shown in the market currency',
+    C.gameCurrency,
     () => {
       expect.soft(credit.currency).toBe(market.currency);
       expect.soft(bet.currency).toBe(market.currency);
@@ -75,8 +75,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   await attachSpin(testInfo, 'Attempt', attempt);
   const signals = attempt.outcome.startSignals;
   await checks.verify(
-    'S2-04',
-    'Spin is rejected: no wager taken and no spin in progress shown',
+    C.spinRejected,
     () => {
       expect.soft(signals).not.toContain('wager-deducted');
       expect.soft(signals).not.toContain('status-text');
@@ -91,20 +90,18 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   await attachPng(testInfo, 'Message frame', message.frame);
   await attachOcr(testInfo, 'Message', message.ocr);
   await checks.verify(
-    'S2-05',
-    'Player sees an insufficient-balance message',
+    C.messageShown,
     () => expect.soft(message.keyword, 'insufficient-balance wording on screen').not.toBeNull(),
     `matched "${message.keyword ?? 'nothing'}" in: ${message.ocr.text.replace(/\s+/g, ' ').trim()}`,
   );
   const foreign = findKeyword(message.ocr.text, foreignKeywords);
   await checks.verify(
-    'S2-06',
-    `Message is in the market language (${market.language})`,
+    C.messageLanguage,
     () => {
       expect.soft(message.keyword).not.toBeNull();
       expect.soft(foreign, 'wording from another language').toBeNull();
     },
-    `market wording: ${message.keyword ?? 'none'}; other-language wording: ${foreign ?? 'none'}`,
+    `expected language: ${market.language}; market wording: ${message.keyword ?? 'none'}; other-language wording: ${foreign ?? 'none'}`,
   );
 
   await test.step('Close the message by its button caption', async () => {
@@ -116,8 +113,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   const after = await test.step('Read the in-game credit after the attempt', () => gamePage.readHud(hudReader));
   await attachHud(testInfo, 'HUD after attempt', after, await gamePage.capture());
   await checks.verify(
-    'S2-07',
-    'In-game credit did not change',
+    C.creditUnchanged,
     () => expect.soft(after.credit?.cents).toBe(credit.cents),
     `before ${money(credit.cents)}, after ${money(after.credit?.cents)}`,
   );
@@ -125,8 +121,7 @@ test('Scenario 2 — insufficient balance', async ({ page, market, game, cookies
   const betssonAfter = await test.step('Read the Betsson balance after the attempt', () => balanceMenu.read());
   await attachPng(testInfo, 'Betsson balance after', betssonAfter.evidence);
   await checks.verify(
-    'S2-08',
-    'Betsson balance did not change',
+    C.betssonUnchanged,
     () => expect.soft(betssonAfter.withdrawable.cents).toBe(betssonBefore.withdrawable.cents),
     `before ${money(betssonBefore.withdrawable.cents)}, after ${money(betssonAfter.withdrawable.cents)}`,
   );

@@ -1,0 +1,156 @@
+name: Game validation
+
+# Unit/vision tests run on every push: free, no account, no browser.
+# The real-money scenarios run on demand (Actions → Game validation → Run workflow), because each
+# run logs in and spends the minimum bet; repeated logins also trip Betsson's anti-fraud limits.
+# Set the repository variable E2E_ON_PUSH=true to also run them on pushes to main.
+on:
+  workflow_dispatch:
+    inputs:
+      markets:
+        description: 'Markets to run, as a JSON list'
+        default: '["betsson-es"]'
+        required: true
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: game-validation-${{ github.ref }}
+  # Never cancel a run halfway through a real-money spin.
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    name: Unit and vision tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Cache OCR language data
+        uses: actions/cache@v4
+        with:
+          path: .cache/tesseract
+          key: tesseract-${{ hashFiles('package-lock.json') }}
+      - run: npm run typecheck
+      - run: npx playwright test --project=unit
+      - name: Upload unit report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-report
+          path: playwright-report/
+          retention-days: 14
+
+  scenarios:
+    name: Scenarios · ${{ matrix.market }}
+    needs: unit
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && vars.E2E_ON_PUSH == 'true') }}
+    # GitHub-hosted runners have US datacenter IPs, which Betsson may block. Set the repository
+    # variable E2E_RUNNER=self-hosted to run on a team laptop registered as a self-hosted runner.
+    runs-on: ${{ vars.E2E_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        market: ${{ fromJSON(inputs.markets || '["betsson-es"]') }}
+    env:
+      MARKETS: ${{ matrix.market }}
+      BETSSON_ES_FUNDED_USERNAME: ${{ secrets.BETSSON_ES_FUNDED_USERNAME }}
+      BETSSON_ES_FUNDED_PASSWORD: ${{ secrets.BETSSON_ES_FUNDED_PASSWORD }}
+      BETSSON_ES_EMPTY_USERNAME: ${{ secrets.BETSSON_ES_EMPTY_USERNAME }}
+      BETSSON_ES_EMPTY_PASSWORD: ${{ secrets.BETSSON_ES_EMPTY_PASSWORD }}
+      BETSSON_ES_PROXY_SERVER: ${{ secrets.BETSSON_ES_PROXY_SERVER }}
+      BETSSON_COM_FUNDED_USERNAME: ${{ secrets.BETSSON_COM_FUNDED_USERNAME }}
+      BETSSON_COM_FUNDED_PASSWORD: ${{ secrets.BETSSON_COM_FUNDED_PASSWORD }}
+      BETSSON_COM_EMPTY_USERNAME: ${{ secrets.BETSSON_COM_EMPTY_USERNAME }}
+      BETSSON_COM_EMPTY_PASSWORD: ${{ secrets.BETSSON_COM_EMPTY_PASSWORD }}
+      BETSSON_COM_PROXY_SERVER: ${{ secrets.BETSSON_COM_PROXY_SERVER }}
+      BETSSON_PE_FUNDED_USERNAME: ${{ secrets.BETSSON_PE_FUNDED_USERNAME }}
+      BETSSON_PE_FUNDED_PASSWORD: ${{ secrets.BETSSON_PE_FUNDED_PASSWORD }}
+      BETSSON_PE_EMPTY_USERNAME: ${{ secrets.BETSSON_PE_EMPTY_USERNAME }}
+      BETSSON_PE_EMPTY_PASSWORD: ${{ secrets.BETSSON_PE_EMPTY_PASSWORD }}
+      BETSSON_PE_PROXY_SERVER: ${{ secrets.BETSSON_PE_PROXY_SERVER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Cache OCR language data
+        uses: actions/cache@v4
+        with:
+          path: .cache/tesseract
+          key: tesseract-${{ hashFiles('package-lock.json') }}
+      # Linux uses Playwright's Chromium; a Windows self-hosted runner uses the installed Chrome.
+      - name: Install Chromium
+        if: ${{ runner.os == 'Linux' }}
+        run: npx playwright install --with-deps chromium
+      - name: Run both scenarios
+        run: npx playwright test --project=${{ matrix.market }}
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-${{ matrix.market }}
+          path: blob-report/
+          retention-days: 7
+
+  report:
+    name: Publish report
+    needs: scenarios
+    if: ${{ !cancelled() && needs.scenarios.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Download blob reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-*
+          path: all-blob-reports
+          merge-multiple: true
+      # Writes site/index.html (check matrix) and site/playwright-report/ (evidence), and the
+      # matrix to this job's summary page.
+      - name: Merge into one report
+        run: npx playwright merge-reports --config merge.config.ts ./all-blob-reports
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-validation-report
+          path: site/
+          retention-days: 30
+      - name: Prepare GitHub Pages artifact
+        if: ${{ vars.PUBLISH_PAGES == 'true' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  pages:
+    name: Deploy report to GitHub Pages
+    needs: report
+    if: ${{ !cancelled() && needs.report.result == 'success' && vars.PUBLISH_PAGES == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -5,11 +5,14 @@ import { attachHud, attachJson, attachPng, attachSpin, hudValues } from '../../s
 import { requireCreditAndBet } from '../../src/game/hud';
 import { watchSpin } from '../../src/game/spin-watcher';
 import { expect, test } from '../../src/fixtures';
+import { SCENARIOS } from '../../src/reporting/check-catalog';
 import { Checks } from '../../src/reporting/checks';
+
+const C = SCENARIOS.spinCompleted.checks;
 
 test.use({ account: 'FUNDED' });
 
-test('Scenario 1 — completed Real Play spin', async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
+test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
   const checks = new Checks(testInfo);
   const money = (cents: number | null) => (cents === null ? 'not read' : formatMoney({ cents, currency: market.currency }, market.locale));
   const rule = (r: BalanceCheck) =>
@@ -23,8 +26,7 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
   const betssonBefore = await test.step('Read the Betsson balance before the spin', () => balanceMenu.read());
   await attachPng(testInfo, 'Betsson balance before', betssonBefore.evidence);
   await checks.verify(
-    'S1-01',
-    'Betsson balance is shown in the market currency',
+    C.betssonCurrency,
     () => expect.soft(betssonBefore.withdrawable.currency).toBe(market.currency),
     `${money(betssonBefore.withdrawable.cents)} (expected ${market.currency})`,
   );
@@ -33,14 +35,12 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
   const mode = await test.step('Enter Real Play', () => gamePage.ensureRealPlay());
   await attachJson(testInfo, 'Play mode', mode);
   await checks.verify(
-    'S1-02',
-    'Game runs in Real Play',
+    C.realPlay,
     () => expect.soft(mode.real).toBe(true),
     `practice banner hidden: ${mode.practiceBannerHidden}, launcher forReal: ${mode.launcherForReal}`,
   );
   await checks.verify(
-    'S1-03',
-    'Game provider is Pragmatic Play',
+    C.provider,
     () => expect.soft(mode.launcherProvider).toBe('PragmaticPlay'),
     `launcher provider: ${mode.launcherProvider}`,
   );
@@ -52,8 +52,7 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
   const { credit, bet } = requireCreditAndBet(ready);
 
   await checks.verify(
-    'S1-04',
-    'In-game credit and wager are shown in the market currency',
+    C.gameCurrency,
     () => {
       expect.soft(credit.currency).toBe(market.currency);
       expect.soft(bet.currency).toBe(market.currency);
@@ -61,8 +60,7 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
     `credit ${money(credit.cents)}, wager ${money(bet.cents)}`,
   );
   await checks.verify(
-    'S1-05',
-    'In-game credit matches the Betsson balance before the spin',
+    C.creditMatchesBetsson,
     () => expect.soft(credit.cents).toBe(betssonBefore.withdrawable.cents),
     `in game ${money(credit.cents)}, Betsson ${money(betssonBefore.withdrawable.cents)}`,
   );
@@ -84,20 +82,17 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
   const outcome = spin.outcome;
 
   await checks.verify(
-    'S1-06',
-    'Spin visibly started (at least two independent on-screen signals)',
+    C.spinStarted,
     () => expect.soft(outcome.startSignals.length).toBeGreaterThanOrEqual(2),
     `signals: ${outcome.startSignals.join(', ') || 'none'}`,
   );
   await checks.verify(
-    'S1-07',
-    'The displayed wager is the amount charged when the spin started',
+    C.wagerCharged,
     () => expect.soft(outcome.creditAfterWagerCents).toBe(credit.cents - bet.cents),
     `credit went ${money(credit.cents)} → ${money(outcome.creditAfterWagerCents)} with a displayed wager of ${money(bet.cents)}`,
   );
   await checks.verify(
-    'S1-08',
-    'Spin completed and its result settled on screen',
+    C.spinSettled,
     () => expect.soft(outcome.settled).toBe(true),
     outcome.changes.map((c) => `${c.to} at ${c.atMs} ms (${c.reason})`).join('; ') || 'no reaction',
   );
@@ -108,7 +103,7 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
     payoutCents: outcome.payoutCents,
     afterCents: outcome.finalCreditCents ?? Number.NaN,
   });
-  await checks.verify('S1-09', 'In-game credit: after = before − wager + payout', () => expect.soft(inGame.ok).toBe(true), rule(inGame));
+  await checks.verify(C.inGameRule, () => expect.soft(inGame.ok).toBe(true), rule(inGame));
 
   const expectedBetsson = betssonBefore.withdrawable.cents - bet.cents + outcome.payoutCents;
   const betssonAfter = await test.step('Read the Betsson balance after the spin', () =>
@@ -121,10 +116,9 @@ test('Scenario 1 — completed Real Play spin', async ({ page, market, game, coo
     payoutCents: outcome.payoutCents,
     afterCents: betssonAfter.withdrawable.cents,
   });
-  await checks.verify('S1-10', 'Betsson balance: after = before − wager + payout', () => expect.soft(betsson.ok).toBe(true), rule(betsson));
+  await checks.verify(C.betssonRule, () => expect.soft(betsson.ok).toBe(true), rule(betsson));
   await checks.verify(
-    'S1-11',
-    'Betsson balance after matches the in-game credit after',
+    C.betssonMatchesGame,
     () => expect.soft(betssonAfter.withdrawable.cents).toBe(outcome.finalCreditCents),
     `Betsson ${money(betssonAfter.withdrawable.cents)}, in game ${money(outcome.finalCreditCents)}`,
   );

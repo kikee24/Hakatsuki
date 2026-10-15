@@ -11,5 +11,5 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["src", "tests", "tools", "playwright.config.ts"]
+  "include": ["src", "tests", "tools", "playwright.config.ts", "merge.config.ts"]
 }

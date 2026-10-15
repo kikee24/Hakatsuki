@@ -45,7 +45,14 @@ export default defineConfig<MarketOptions>({
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,
-  reporter: [['list'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['./src/reporting/check-matrix-reporter.ts', { outputDir: 'check-matrix', reportLink: '../playwright-report/index.html' }],
+    // In CI each market job also writes a blob; the report job merges them (see merge.config.ts).
+    ...(process.env.CI ? [['blob'] as ['blob']] : []),
+  ],
   use: {
     trace: 'on',
     video: 'on',

@@ -68,7 +68,44 @@ They are never committed, and login runs without tracing so they never appear in
 ## Running
 
 ```bash
-npm run test:unit      # domain logic, no browser
-npm run test:es        # all scenarios on betsson.es
-npm run report         # open the HTML report
+npm run test:unit      # domain logic and OCR on fixtures, no browser
+npm run test:es        # log in (once per account) and run both scenarios on betsson.es
+npm run report         # open the Playwright HTML report
 ```
+
+After a scenario run, `check-matrix/index.html` shows every check (rows) per market (columns) as
+pass / fail / not run, with the compared values. The Playwright report holds the evidence: game
+frames per spin phase, reel-motion diffs, the exact OCR inputs and text, traces and videos.
+
+## GitHub Actions
+
+Workflow: `.github/workflows/game-validation.yml`.
+
+| Job | When | What |
+|---|---|---|
+| Unit and vision tests | every push and pull request | typecheck + `--project=unit` (no account, no browser) |
+| Scenarios · *market* | manual (*Actions → Game validation → Run workflow*) | both scenarios, one matrix job per market |
+| Publish report | after the scenarios | merges all markets into one report and writes the check matrix to the job summary |
+
+The scenarios are manual on purpose: each run logs in and spends the minimum bet, and frequent
+logins trip Betsson's anti-fraud limits.
+
+**Report artifact** `game-validation-report`: `index.html` is the check matrix,
+`playwright-report/` the full evidence. The matrix also appears on the run's summary page.
+
+### Repository secrets (*Settings → Secrets and variables → Actions → Secrets*)
+
+`BETSSON_ES_FUNDED_USERNAME`, `BETSSON_ES_FUNDED_PASSWORD`, `BETSSON_ES_EMPTY_USERNAME`,
+`BETSSON_ES_EMPTY_PASSWORD`, and optionally `BETSSON_ES_PROXY_SERVER`. Same names with `COM` /
+`PE` for the other markets.
+
+### Repository variables (optional, same page → *Variables*)
+
+| Variable | Effect |
+|---|---|
+| `E2E_RUNNER` | Runner label for the scenarios. Default `ubuntu-latest`; set `self-hosted` to run on a team laptop if Betsson blocks GitHub's datacenter IPs |
+| `E2E_ON_PUSH` | `true` also runs the scenarios on every push to `main` |
+| `PUBLISH_PAGES` | `true` also publishes the report to GitHub Pages (enable Pages with source *GitHub Actions* first) |
+
+A self-hosted runner is registered from *Settings → Actions → Runners → New self-hosted runner*.
+On Windows it uses the installed Google Chrome; credentials still come from the repository secrets.

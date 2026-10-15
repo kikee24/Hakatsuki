@@ -4,7 +4,7 @@ import { CHECK_ANNOTATION, Checks } from '../../src/reporting/checks';
 
 test('a passing check is recorded with its detail and as a report annotation', async ({}, testInfo) => {
   const checks = new Checks(testInfo);
-  const passed = await checks.verify('X-01', 'two plus two', () => expect.soft(2 + 2).toBe(4), '2 + 2 = 4');
+  const passed = await checks.verify({ id: 'X-01', title: 'two plus two' }, () => expect.soft(2 + 2).toBe(4), '2 + 2 = 4');
 
   expect(passed).toBe(true);
   expect(checks.records).toEqual([{ id: 'X-01', title: 'two plus two', passed: true, detail: '2 + 2 = 4' }]);

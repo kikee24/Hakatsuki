@@ -1,4 +1,5 @@
 import { test, type TestInfo } from '@playwright/test';
+import type { CheckDefinition } from './check-catalog';
 
 export interface CheckRecord {
   id: string;
@@ -8,7 +9,7 @@ export interface CheckRecord {
   detail?: string;
 }
 
-/** Annotation type under which every check is stored; the summary reporter reads these. */
+/** Annotation type under which every check is stored; the check-matrix reporter reads these. */
 export const CHECK_ANNOTATION = 'check';
 
 /**
@@ -20,11 +21,11 @@ export class Checks {
 
   constructor(private readonly testInfo: TestInfo) {}
 
-  async verify(id: string, title: string, assertion: () => void | Promise<void>, detail?: string): Promise<boolean> {
-    return test.step(`[${id}] ${title}`, async () => {
+  async verify(check: CheckDefinition, assertion: () => void | Promise<void>, detail?: string): Promise<boolean> {
+    return test.step(`[${check.id}] ${check.title}`, async () => {
       const errorsBefore = this.testInfo.errors.length;
       await assertion();
-      const record: CheckRecord = { id, title, passed: this.testInfo.errors.length === errorsBefore, detail };
+      const record: CheckRecord = { ...check, passed: this.testInfo.errors.length === errorsBefore, detail };
       this.records.push(record);
       this.testInfo.annotations.push({ type: CHECK_ANNOTATION, description: JSON.stringify(record) });
       return record.passed;
