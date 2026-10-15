@@ -1,4 +1,0 @@
-variant: threshold
-confidence: 64
-
-— [HAGA SU APUESTA!”

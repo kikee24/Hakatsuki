@@ -1,7 +1,0 @@
-money [threshold]:
-CRÉDITO 98,90 €
-7 APUESTA 2,00 €
-
-status [threshold]:
-, DN
-¡HAGA SU APUESTA! -

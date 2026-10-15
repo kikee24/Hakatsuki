@@ -1,8 +1,10 @@
 # Panel de control de resultados — guía para construirlo
 
 > **Ya implementado**: lo genera `src/reporting/dashboard-reporter.ts` al acabar cada ejecución
-> (`dashboard/index.html`, `npm run report`) y en CI se publica en GitHub Pages. Para generarlo desde
-> una exportación: `npm run report -- docs/panel-sample`. Ver la sección *Results dashboard* del README.
+> (`dashboard/index.html`, `npm run report`), solo en local: muestra las pantallas de las cuentas
+> reales, así que no se sube a git ni a GitHub Pages (en CI solo si `PUBLISH_PAGES=true`). Para
+> generarlo desde una exportación: `npm run report -- results-export/<fecha>`. Ver la sección
+> *Results dashboard* del README.
 > Esta guía queda como referencia del formato de los datos.
 
 Objetivo: al terminar una ejecución, lanzar **un comando** (`npm run panel`) que abra un panel con
@@ -22,14 +24,8 @@ npm ci
 
 ## 2. Conseguir datos de una ejecución
 
-**Ya hay una ejecución real en el repo para empezar: [`docs/panel-sample/`](panel-sample/)**
-(15/10, 16:35, betsson.es): los dos escenarios **en verde, 19/19 checks**, el smoke del lobby y los
-66 tests unitarios, con todas sus capturas en `files/`. Revisada a mano: sin credenciales, sin nombre
-del jugador, sin cookies ni trazas. Con esto se puede hacer el panel entero sin cuenta ni Betsson;
-`npm run panel` puede usarla por defecto cuando no haya ninguna carpeta en `results-export/`.
-
-Para ejecuciones nuevas, los resultados **no están en git** (`.gitignore`): se generan en cada
-ejecución. Tres formas:
+Los resultados **no están en git** (`.gitignore`): se generan en cada ejecución y se quedan en el
+PC donde se ejecutó, porque muestran las pantallas de las cuentas reales. Tres formas:
 
 | Forma | Cuándo | Cómo |
 |---|---|---|

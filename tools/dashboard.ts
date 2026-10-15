@@ -3,12 +3,12 @@
  *
  *   npm run report                                 dashboard of the last run (dashboard/index.html)
  *   npm run report -- results-export/<timestamp>   build it from a folder written by export:results
- *   npm run report -- docs/panel-sample            the reviewed sample run in the repository
  *   npm run report -- <folder> --no-open           build only
  *
  * The last run's dashboard is written by the dashboard reporter when the tests end. Without one,
- * the newest results-export/ folder is used, then docs/panel-sample. Exports are built into
- * dashboard-export/, so they never replace the last run's dashboard.
+ * the newest results-export/ folder is used. Everything stays on this machine: dashboard/,
+ * results-export/ and dashboard-export/ are gitignored, since they show the real accounts' screens.
+ * Exports are built into dashboard-export/, so they never replace the last run's dashboard.
  */
 import { spawn } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -22,7 +22,6 @@ const source = args.find((a) => !a.startsWith('--'));
 
 const LAST_RUN = join('dashboard', 'index.html');
 const EXPORT_OUT = 'dashboard-export';
-const SAMPLE = join('docs', 'panel-sample');
 
 const hasResults = (dir: string) => existsSync(join(dir, 'scenarios.json')) || existsSync(join(dir, 'unit.json'));
 
@@ -63,7 +62,11 @@ if (source) {
   index = LAST_RUN;
   console.log(`Dashboard of the last run → ${index}`);
 } else {
-  const dir = newestExport() ?? SAMPLE;
+  const dir = newestExport();
+  if (!dir) {
+    console.error('No run yet: the dashboard is written to dashboard/ when the tests end. Run npm test first (see README).');
+    process.exit(1);
+  }
   console.log(`No dashboard from a run yet (it is written when the tests end); using ${dir}.`);
   index = build(dir);
 }

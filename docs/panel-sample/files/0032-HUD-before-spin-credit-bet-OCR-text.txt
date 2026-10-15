@@ -1,5 +1,0 @@
-variant: threshold
-confidence: 85
-
-y, CRÉDITO 98,55 €
-+ APUESTA 0,25 €
