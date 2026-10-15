@@ -17,6 +17,23 @@ relying on the game's DOM.
 The test accounts we were given are on **betsson.es**, so it is the default market. The other
 markets are kept as configuration and can be enabled with `MARKETS=betsson-es,betsson-pe`.
 
+## How the checker sees the game
+
+The game is a canvas inside a cross-origin iframe, so every in-game fact comes from screenshots
+of that iframe:
+
+| Question | How it is answered | Code |
+|---|---|---|
+| What are the credit, bet and win? | OCR (Tesseract) on HUD regions, reading the amount right after each label (`CRÉDITO`, `APUESTA`, `GANANCIA`) | `src/game/hud.ts`, `src/vision/ocr.ts` |
+| Did the spin start? | At least one of: status line says `¡BUENA SUERTE!`, credit dropped by exactly the bet, reels moved in two consecutive frames | `src/game/spin-tracker.ts` |
+| Did it finish? | Status line shows a win, or reels still for 2 frames after having moved | `src/game/spin-tracker.ts` |
+| Is the result final? | Credit identical in 2 consecutive reads (win count-up done) | `src/game/spin-tracker.ts` |
+| Did the reels move? | Pixel diff of the reel area between frames (> 2% changed) | `src/vision/motion.ts` |
+| Insufficient funds? | OCR of the pop-up, fuzzy-matched against the market's localized keywords | `src/game/hud-reader.ts` |
+
+Thresholds were measured on real screenshots (`tests/fixtures/screens`): compression noise gives
+0% reel change, one reel still spinning ~6%, a new set of symbols 55-67%.
+
 ## Project layout
 
 ```
