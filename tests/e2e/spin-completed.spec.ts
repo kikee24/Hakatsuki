@@ -10,7 +10,9 @@ import { Checks } from '../../src/reporting/checks';
 
 const C = SCENARIOS.spinCompleted.checks;
 
-test.use({ account: 'FUNDED' });
+// Playwright's own trace/video/screenshots would record its idle launched browser (blank pages):
+// the hand-logged-in tab is traced by the page fixture instead.
+test.use({ account: 'FUNDED', trace: 'off', video: 'off', screenshot: 'off' });
 
 test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
   // A bonus round can add a few minutes to the spin.

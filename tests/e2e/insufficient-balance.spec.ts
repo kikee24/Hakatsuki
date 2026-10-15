@@ -10,7 +10,9 @@ import { Checks } from '../../src/reporting/checks';
 
 const C = SCENARIOS.insufficientBalance.checks;
 
-test.use({ account: 'EMPTY' });
+// Playwright's own trace/video/screenshots would record its idle launched browser (blank pages):
+// the hand-logged-in tab is traced by the page fixture instead.
+test.use({ account: 'EMPTY', trace: 'off', video: 'off', screenshot: 'off' });
 
 test(SCENARIOS.insufficientBalance.title, async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
   const checks = new Checks(testInfo);
