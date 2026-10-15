@@ -9,7 +9,7 @@ import { gameFrame } from './support/screens';
 const reels = loadGame('wolf-gold').regions.reels;
 const idleHud = (): HudReading => ({ status: 'idle', credit: { cents: 9890, currency: 'EUR' }, bet: { cents: 200, currency: 'EUR' }, win: null });
 
-async function thresholdWith(atRest: [Buffer, Buffer]): Promise<{ idle: number | null; threshold: number }> {
+async function thresholdWith(atRest: [Buffer, Buffer]): Promise<{ idle: number | null; threshold: number; moving: number }> {
   const frames = [...atRest];
   const result = await watchSpin({
     capture: async () => frames.shift() ?? atRest[1],
@@ -22,7 +22,7 @@ async function thresholdWith(atRest: [Buffer, Buffer]): Promise<{ idle: number |
     sleep: async () => {},
     now: (() => { let t = 0; return () => (t += 500); })(),
   });
-  return { idle: result.idleMotionRatio, threshold: result.motionThreshold };
+  return { idle: result.idleMotionRatio, threshold: result.stillThreshold, moving: result.motionThreshold };
 }
 
 test('still reels at rest keep the default threshold', async () => {
@@ -32,9 +32,10 @@ test('still reels at rest keep the default threshold', async () => {
   expect(threshold).toBe(MOTION_THRESHOLD);
 });
 
-test('reels that change at rest raise the threshold above that motion', async () => {
+test('reels that change at rest raise the still threshold above that motion, not the moving one', async () => {
   // Two different frames stand in for always-animated symbols.
-  const { idle: ratio, threshold } = await thresholdWith([await gameFrame('wolf-gold-real-idle.webp'), await gameFrame('wolf-gold-practice-win.webp')]);
+  const { idle: ratio, threshold, moving } = await thresholdWith([await gameFrame('wolf-gold-real-idle.webp'), await gameFrame('wolf-gold-practice-win.webp')]);
+  expect(moving).toBe(MOTION_THRESHOLD);
   expect(ratio).toBeGreaterThan(MOTION_THRESHOLD);
   expect(threshold).toBeGreaterThan(ratio!);
 });

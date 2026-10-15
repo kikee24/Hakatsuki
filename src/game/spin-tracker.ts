@@ -38,6 +38,11 @@ export interface PhaseChange {
 
 export interface SpinTrackerOptions {
   motionThreshold: number;
+  /**
+   * At or below this the reels count as still. Defaults to motionThreshold; higher for games whose
+   * symbols move at rest, so their idle animation is not taken for spinning reels (watchSpin).
+   */
+  stillThreshold?: number;
   /** Consecutive moving frames needed to count as reel motion (a pop-up appearing moves only one). */
   movingFrames: number;
   /** Consecutive still frames needed to count the reels as stopped. */
@@ -127,7 +132,8 @@ export class SpinTracker {
     }
 
     if (this.current === 'spinning') {
-      this.stillStreak = moving || motionRatio === null ? 0 : this.stillStreak + 1;
+      const still = motionRatio !== null && motionRatio <= (this.options.stillThreshold ?? this.options.motionThreshold);
+      this.stillStreak = still ? this.stillStreak + 1 : 0;
       // A win left over from the previous spin does not stop this one: wait for the reels instead.
       if (newWin) {
         this.moveTo('stopped', atMs, 'status line shows a win');

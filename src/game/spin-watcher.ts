@@ -66,9 +66,10 @@ export interface SpinWatchResult {
   timedOut: boolean;
   /** Times a bonus prompt was pressed to continue. */
   bonusPresses: number;
-  /** Reel motion at rest measured before the spin (idleBaselineMs), and the threshold used. */
+  /** Reel motion at rest measured before the spin (idleBaselineMs), and the thresholds used. */
   idleMotionRatio: number | null;
   motionThreshold: number;
+  stillThreshold: number;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -91,9 +92,14 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
     idleMotionRatio = (await compareFrames(previous, second, reelsRegion)).changedRatio;
     previous = second;
   }
-  // Moving = clearly above what the reels do on their own at rest.
-  const motionThreshold = Math.max(options.tracker?.motionThreshold ?? MOTION_THRESHOLD, idleMotionRatio === null ? 0 : idleMotionRatio * 2.5 + 0.01);
-  const tracker = new SpinTracker(baseline, { ...options.tracker, motionThreshold });
+  // "Moving" (the spin happened) keeps the normal threshold: any clear motion proves it. "Still" is
+  // judged against what the reels do on their own at rest, so an idle animation is not motion.
+  // (Live, Bubble Up: one raised threshold for both hid the spin itself, and it timed out.)
+  const motionThreshold = options.tracker?.motionThreshold ?? MOTION_THRESHOLD;
+  const stillThreshold = Math.max(motionThreshold, idleMotionRatio === null ? 0 : idleMotionRatio * 2.5 + 0.01);
+  const tracker = new SpinTracker(baseline, { ...options.tracker, motionThreshold, stillThreshold });
+  const pct = (r: number) => `${(100 * r).toFixed(1)}%`;
+  log(`idle reel motion ${idleMotionRatio === null ? 'not measured' : pct(idleMotionRatio)}, moving above ${pct(motionThreshold)}, still at or below ${pct(stillThreshold)}`);
   const keyFrames: KeyFrame[] = [
     { phase: 'armed', reason: 'before spin', atMs: 0, frame: previous, diff: null, motionRatio: null, hud: null },
   ];
@@ -168,5 +174,5 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
     }
   }
 
-  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses, idleMotionRatio, motionThreshold };
+  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses, idleMotionRatio, motionThreshold, stillThreshold };
 }

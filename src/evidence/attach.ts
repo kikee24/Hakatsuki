@@ -52,6 +52,7 @@ export async function attachSpin(testInfo: TestInfo, label: string, result: Spin
     bonusPresses: result.bonusPresses,
     idleMotionRatio: result.idleMotionRatio,
     motionThreshold: result.motionThreshold,
+    stillThreshold: result.stillThreshold,
     ...result.outcome,
     keyFrames: result.keyFrames.map((k) => ({
       phase: k.phase,
