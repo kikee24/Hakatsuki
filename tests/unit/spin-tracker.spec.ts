@@ -71,3 +71,19 @@ test('does not call the reels stopped without ever having seen them move', () =>
   ]);
   expect(outcome).toMatchObject({ started: true, stopped: false });
 });
+
+test('a win left on screen by the previous spin is not this spin\'s payout', () => {
+  // Live run, 15 Oct: after a bonus the status line kept "GANANCIA 1,85 €" while the next spin
+  // turned, with the credit already reduced by the wager; that spin lost ("¡HAGA SU APUESTA!").
+  const outcome = run([
+    [hud('win', 9690, 185), 0.55], // wager taken, stale win, reels turning
+    [hud('win', 9690, 185), 0.6],
+    [hud('win', 9690, 185), 0], // reels stopped
+    [hud('idle', 9690), 0],
+    [hud('idle', 9690), 0],
+    [hud('idle', 9690), 0],
+  ]);
+  expect(outcome).toMatchObject({ settled: true, payoutCents: 0, finalCreditCents: 9690 });
+  expect(outcome.startSignals).toEqual(expect.arrayContaining(['wager-deducted', 'reel-motion']));
+  expect(outcome.changes.find((c) => c.to === 'stopped')?.reason).not.toBe('status line shows a win');
+});

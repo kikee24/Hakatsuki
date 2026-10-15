@@ -91,9 +91,11 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
     const atMs = now() - startedAt;
     framesObserved++;
 
-    // Once the reels stopped, a full-screen bonus prompt means the round is not over. Not read while
-    // the reels spin: that OCR is slow and would thin out the frames used for motion.
-    const lookForPrompt = readPrompt && (tracker.phase === 'stopped' || tracker.outcome.bonus);
+    // A full-screen bonus prompt means the round is not over. That OCR is slow (about a second) and
+    // would thin out the frames used for motion, so it only runs when the status line points to a
+    // bonus or cannot be read (a prompt covering it); a plain spin never pays for it.
+    const lookForPrompt =
+      readPrompt && tracker.phase !== 'armed' && (hud.bonus || tracker.outcome.bonus || hud.status === 'unknown');
     const prompt = lookForPrompt ? await readPrompt(frame) : false;
     if (prompt) hud = { ...hud, bonus: true };
 

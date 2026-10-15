@@ -79,6 +79,11 @@ export class SpinTracker {
   private finalCredit: number | null = null;
   private payout = 0;
   private bonusSeen = false;
+  /**
+   * Win already on screen at the first look after the trigger: Wolf Gold keeps the previous spin's
+   * win displayed while the reels turn (seen live after a bonus), so it is not this spin's payout.
+   */
+  private staleWin: number | null | undefined;
 
   constructor(
     private readonly baseline: SpinBaseline,
@@ -96,6 +101,8 @@ export class SpinTracker {
     this.movingStreak = moving ? this.movingStreak + 1 : 0;
     const credit = hud.credit?.cents ?? null;
     if (hud.bonus) this.bonusSeen = true;
+    if (this.staleWin === undefined) this.staleWin = hud.status === 'win' ? (hud.win?.cents ?? null) : null;
+    const newWin = hud.status === 'win' && hud.win !== null && hud.win.cents !== this.staleWin;
 
     if (this.current === 'armed' || this.current === 'spinning') {
       if (hud.status === 'spinning') this.signals.add('status-text');
@@ -113,7 +120,8 @@ export class SpinTracker {
 
     if (this.current === 'spinning') {
       this.stillStreak = moving || motionRatio === null ? 0 : this.stillStreak + 1;
-      if (hud.status === 'win') {
+      // A win left over from the previous spin does not stop this one: wait for the reels instead.
+      if (newWin) {
         this.moveTo('stopped', atMs, 'status line shows a win');
       } else if (
         this.signals.has('reel-motion') &&
@@ -127,11 +135,18 @@ export class SpinTracker {
     }
 
     if (this.current === 'stopped') {
-      if (hud.win) this.payout = hud.win.cents;
+      if (newWin) this.payout = hud.win!.cents;
       this.stableStreak = credit !== null && credit === this.lastCredit ? this.stableStreak + 1 : credit !== null ? 1 : 0;
       this.lastCredit = credit;
       if (this.stableStreak >= this.options.stableReads && hud.status !== 'spinning' && !hud.bonus) {
         this.finalCredit = credit;
+        if (hud.status === 'idle') {
+          // "¡HAGA SU APUESTA!" once the spin is over: it paid nothing (a win stays displayed).
+          this.payout = 0;
+        } else if (hud.status === 'win' && hud.win && this.payout === 0 && credit !== null && credit > this.baseline.creditCents - this.baseline.betCents) {
+          // Same amount as the previous win, but the credit went up: it is a new win after all.
+          this.payout = hud.win.cents;
+        }
         this.moveTo('settled', atMs, `credit stable at ${credit} cents for ${this.stableStreak} reads`);
       }
     }
