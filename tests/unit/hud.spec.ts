@@ -48,3 +48,24 @@ test.describe('status line', () => {
     expect(readStatusLine('WILDS APILABLES MONEY RESPIN', es)).toEqual({ status: 'unknown', win: null });
   });
 });
+
+test.describe('amounts without cents are OCR misreads', () => {
+  test('rejects "GANANCIA 15 €" (live misread of 0,15 €) but keeps real amounts', () => {
+    expect(readStatusLine('GANANCIA 15 €', es).win).toBeNull();
+    expect(readStatusLine('GANANCIA A 15 €\nTIRADAS GRATIS COMPLETADAS', es).win).toBeNull();
+    expect(readStatusLine('GANANCIA 0,15 €', es).win?.cents).toBe(15);
+    expect(amountAfterLabel('CRÉDITO 99.998,00 €', es.credit)?.cents).toBe(9999800);
+  });
+});
+
+test.describe('win total when OCR lost the GANANCIA label', () => {
+  // Real Tesseract output of the live frame where "GANANCIA 0,15 €" was misread.
+  test('takes the first-line amount when the per-line detail is below', () => {
+    expect(readStatusLine('0,15 €\nLA LINEA 11 ABONA 0,15 €', es)).toEqual({ status: 'win', win: { cents: 15, currency: 'EUR' } });
+  });
+
+  test('not without the per-line detail, nor without decimals', () => {
+    expect(readStatusLine('0,15 €', es).status).toBe('unknown');
+    expect(readStatusLine('15 €\nLA LINEA 11 ABONA 0,15 €', es).win).toBeNull();
+  });
+});

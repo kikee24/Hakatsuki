@@ -23,5 +23,10 @@
     "bonusLabel": "Bono",
     "practiceBanner": "modo Práctica",
     "realModeLink": "Quiero jugar en modo real"
+  },
+  "gameSession": {
+    "timeLimitMinutes": 15,
+    "lossLimit": "2,00",
+    "noExclusionLabel": "Sin exclusión"
   }
 }

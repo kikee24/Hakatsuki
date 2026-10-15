@@ -1,0 +1,4 @@
+variant: threshold
+confidence: 61
+
+— ¡HAGA SU APUESTA!”

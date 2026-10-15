@@ -1,0 +1,6 @@
+status:
+GANANCIA 0,25 € “
+TIRADAS GRATIS RESTANTES 2
+
+message:
+A

@@ -5,10 +5,10 @@ import { getProxy } from './src/config/env';
 import { activeMarkets, loadMarket } from './src/config/market';
 import type { MarketOptions } from './src/fixtures';
 
-const AUTH_SETUP = /auth\.setup\.ts/;
-
-// Per market: a "-setup" project that logs in (no trace/video, credentials are typed there) and
-// the scenario project, which depends on it and starts from the saved sessions.
+// Per market: a "-session" project, run on demand, that opens each account's browser window and
+// waits for a manual login if Betsson forgot it (npm run session:funded / session:empty), and the
+// scenario project. Scenarios do the same check themselves through the `page` fixture, so they do
+// not depend on the session project.
 const marketProjects: Project<MarketOptions>[] = activeMarkets().flatMap((id) => {
   const market = loadMarket(id);
   const use = {
@@ -23,20 +23,31 @@ const marketProjects: Project<MarketOptions>[] = activeMarkets().flatMap((id) =>
   };
   return [
     {
-      name: `${id}-setup`,
-      testDir: './tests/e2e',
-      testMatch: AUTH_SETUP,
-      use: { ...use, trace: 'off', video: 'off', screenshot: 'off' },
+      name: `${id}-session`,
+      testDir: './tests/setup',
+      testMatch: /.*\.setup\.ts/,
+      timeout: 15 * 60_000,
+      use: { marketId: id, trace: 'off', video: 'off', screenshot: 'off' },
     },
     {
+      // 1 worker, in file order: keep each account's tests together so the windows are switched
+      // as few times as possible.
       name: id,
       testDir: './tests/e2e',
-      testIgnore: AUTH_SETUP,
-      dependencies: [`${id}-setup`],
       use,
     },
   ];
 });
+
+// A run of the unit tests alone (npm run test:unit) writes its own reports, so it never replaces
+// the report, results.json or check matrix of a scenario run.
+const requestedProjects = process.argv.flatMap((arg, i, all) =>
+  arg.startsWith('--project=') ? [arg.slice('--project='.length)] : arg === '--project' && all[i + 1] ? [all[i + 1]!] : [],
+);
+const unitOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p === 'unit');
+// npm run session:funded / session:empty only (re)open a logged-in window: console output only, so
+// they never replace the last scenario run's report either.
+const sessionOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p.endsWith('-session'));
 
 export default defineConfig<MarketOptions>({
   timeout: 180_000,
@@ -45,18 +56,30 @@ export default defineConfig<MarketOptions>({
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['./src/reporting/check-matrix-reporter.ts', { outputDir: 'check-matrix', reportLink: '../playwright-report/index.html' }],
-    // In CI each market job also writes a blob; the report job merges them (see merge.config.ts).
-    ...(process.env.CI ? [['blob'] as ['blob']] : []),
-  ],
+  reporter: sessionOnly
+    ? [['list']]
+    : unitOnly
+    ? [
+        ['list'],
+        ['html', { open: 'never', outputFolder: 'playwright-report-unit' }],
+        ['json', { outputFile: 'test-results-unit/results.json' }],
+      ]
+    : [
+        ['list'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+        ['./src/reporting/check-matrix-reporter.ts', { outputDir: 'check-matrix', reportLink: '../playwright-report/index.html' }],
+        // In CI each market job also writes a blob; the report job merges them (see merge.config.ts).
+        ...(process.env.CI ? [['blob'] as ['blob']] : []),
+      ],
   use: {
     trace: 'on',
     video: 'on',
     screenshot: 'on',
   },
-  projects: [{ name: 'unit', testDir: './tests/unit' }, ...marketProjects],
+  projects: [
+    // Own output folder: running the unit tests must never wipe a scenario run's test-results/.
+    { name: 'unit', testDir: './tests/unit', outputDir: 'test-results-unit' },
+    ...marketProjects,
+  ],
 });

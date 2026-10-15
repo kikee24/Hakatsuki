@@ -1,0 +1,3085 @@
+{
+  "suites": [
+    {
+      "title": "tests\\unit\\bonus.spec.ts",
+      "file": "tests/unit/bonus.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "bonus texts",
+          "file": "tests/unit/bonus.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "free spins still running",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:05.213Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-e68327ef1193efd9b06e",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "free spins finished or no bonus",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:05.297Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-a223af3feddc3e67cbca",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 21,
+              "column": 3
+            },
+            {
+              "title": "prompt waiting for the player",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:05.323Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-d01f46fa677ab0b3dc4a",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 26,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "bonus on real Wolf Gold frames (OCR)",
+          "file": "tests/unit/bonus.spec.ts",
+          "line": 32,
+          "column": 6,
+          "specs": [
+            {
+              "title": "bonus: wolf-gold-free-spins.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2355,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:05.350Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0046-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-c7d369b943f060a2fa18",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            {
+              "title": "bonus: wolf-gold-free-spins-end.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1427,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:08.539Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0047-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-33818bd4ee5a8b9ee046",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            {
+              "title": "bonus: wolf-gold-after-free-spins.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4182,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:09.994Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0048-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-91ec672778947dbfb2a0",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            {
+              "title": "a base game frame shows no bonus and no prompt",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4058,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:14.201Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-259cb982ac21796168ca",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 57,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "spin watcher with a bonus round",
+          "file": "tests/unit/bonus.spec.ts",
+          "line": 64,
+          "column": 6,
+          "specs": [
+            {
+              "title": "waits for the free spins, presses the prompts and reconciles the bonus total",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1086,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:18.302Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "abb8867b0d148ae94300-6cb3fdd1edfc390e5011",
+              "file": "tests/unit/bonus.spec.ts",
+              "line": 78,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\check-matrix.spec.ts",
+      "file": "tests/unit/check-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "lists every catalog check, marking unreached ones as not run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.428Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d015e727918175db3a0b-99b83f3ba073e5280b1f",
+          "file": "tests/unit/check-matrix.spec.ts",
+          "line": 10,
+          "column": 1
+        },
+        {
+          "title": "passes only when every check of every scenario passed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.451Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d015e727918175db3a0b-0b88b2ab8cd44d38a320",
+          "file": "tests/unit/check-matrix.spec.ts",
+          "line": 29,
+          "column": 1
+        },
+        {
+          "title": "one column per market",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.469Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d015e727918175db3a0b-0364c70bb1fcaab0f48d",
+          "file": "tests/unit/check-matrix.spec.ts",
+          "line": 36,
+          "column": 1
+        },
+        {
+          "title": "markdown shows the verdict, the table, failed check details and run errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.486Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d015e727918175db3a0b-4ccb9e4cb63a7031c052",
+          "file": "tests/unit/check-matrix.spec.ts",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "html escapes values coming from the page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.517Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d015e727918175db3a0b-e8fbcb6a7b3241cc0e30",
+          "file": "tests/unit/check-matrix.spec.ts",
+          "line": 55,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\checks.spec.ts",
+      "file": "tests/unit/checks.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "a passing check is recorded with its detail and as a report annotation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "check",
+                  "description": "{\"id\":\"X-01\",\"title\":\"two plus two\",\"passed\":true,\"detail\":\"2 + 2 = 4\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "steps": [
+                    {
+                      "title": "[X-01] two plus two",
+                      "duration": 3
+                    }
+                  ],
+                  "startTime": "2026-10-15T14:36:19.554Z",
+                  "annotations": [
+                    {
+                      "type": "check",
+                      "description": "{\"id\":\"X-01\",\"title\":\"two plus two\",\"passed\":true,\"detail\":\"2 + 2 = 4\"}"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "01be603a0d120b51532e-d86281901fd3036319de",
+          "file": "tests/unit/checks.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ],
+      "suites": [
+        {
+          "title": "matchesWord",
+          "file": "tests/unit/checks.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "accepts OCR noise within one error per five letters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.575Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "01be603a0d120b51532e-a9c11bf37332e376be13",
+              "file": "tests/unit/checks.spec.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "rejects different words",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.593Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "01be603a0d120b51532e-67a2128d7bd4d71b5264",
+              "file": "tests/unit/checks.spec.ts",
+              "line": 22,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\domain.spec.ts",
+      "file": "tests/unit/domain.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "every market config is valid",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:19.747Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c6e9a6815fce29ff22b2-f74318a9d074135d0267",
+          "file": "tests/unit/domain.spec.ts",
+          "line": 39,
+          "column": 1
+        }
+      ],
+      "suites": [
+        {
+          "title": "reconcileBalance",
+          "file": "tests/unit/domain.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "losing spin",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.619Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-89ff260b04a8360b5780",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 7,
+              "column": 3
+            },
+            {
+              "title": "winning spin",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.670Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-e1019942a2f1187a6065",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "reports the difference when it does not reconcile",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.686Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-a6a3f20eb0d48468f6da",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 17,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "fuzzy text matching",
+          "file": "tests/unit/domain.spec.ts",
+          "line": 23,
+          "column": 6,
+          "specs": [
+            {
+              "title": "tolerates OCR noise and accents",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.702Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-999d7569e83a801cb88d",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 24,
+              "column": 3
+            },
+            {
+              "title": "does not match unrelated text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.717Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-b30e87601ee13725f3f6",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "English keywords do not match a Spanish message",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.731Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-ffe03a768a24e9d5c5a1",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 33,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "activeMarkets",
+          "file": "tests/unit/domain.spec.ts",
+          "line": 43,
+          "column": 6,
+          "specs": [
+            {
+              "title": "defaults to betsson.es",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.763Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-5a31c9ac40253287af64",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 44,
+              "column": 3
+            },
+            {
+              "title": "reads a comma-separated list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.778Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-77be0c1c8d820a38379b",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "title": "rejects unknown markets",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.796Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c6e9a6815fce29ff22b2-505e7c775b990ede9b0b",
+              "file": "tests/unit/domain.spec.ts",
+              "line": 52,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\hud.spec.ts",
+      "file": "tests/unit/hud.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "money block",
+          "file": "tests/unit/hud.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "reads credit and bet despite noise before the labels",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.837Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-3681a43ebc0286dca378",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "tolerates quotes, dashes and missing accents around the values",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.853Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-a6fab4b75c9b7e01ce4f",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 14,
+              "column": 3
+            },
+            {
+              "title": "accepts one OCR error in a label",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.870Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-868c4476982088102fc4",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 22,
+              "column": 3
+            },
+            {
+              "title": "returns null when the label is missing",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.885Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-02006c074b1c2fc2e311",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 26,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "status line",
+          "file": "tests/unit/hud.spec.ts",
+          "line": 31,
+          "column": 6,
+          "specs": [
+            {
+              "title": "idle",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.902Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-9fed04a0c45499e97042",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 32,
+              "column": 3
+            },
+            {
+              "title": "spinning, with an OCR accent error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.917Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-a35fb5010752a1c43359",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 36,
+              "column": 3
+            },
+            {
+              "title": "win: takes the GANANCIA amount, not the per-line detail",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.935Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-eda3239bcf4f86e7c69b",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 40,
+              "column": 3
+            },
+            {
+              "title": "unknown for unrelated text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.951Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-8e6322d28b50f432ae61",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 47,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "amounts without cents are OCR misreads",
+          "file": "tests/unit/hud.spec.ts",
+          "line": 52,
+          "column": 6,
+          "specs": [
+            {
+              "title": "rejects \"GANANCIA 15 €\" (live misread of 0,15 €) but keeps real amounts",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.966Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-2713ea07f08d0ee93cc2",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 53,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "win total when OCR lost the GANANCIA label",
+          "file": "tests/unit/hud.spec.ts",
+          "line": 61,
+          "column": 6,
+          "specs": [
+            {
+              "title": "takes the first-line amount when the per-line detail is below",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.983Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-516914b3f64909ee278c",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 63,
+              "column": 3
+            },
+            {
+              "title": "not without the per-line detail, nor without decimals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:19.999Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6688962e6db485c2fb1e-2a3a629a1036e65fd6f4",
+              "file": "tests/unit/hud.spec.ts",
+              "line": 67,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\money.spec.ts",
+      "file": "tests/unit/money.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "parseMoney",
+          "file": "tests/unit/money.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "\"CREDIT €99.80\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.021Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-6154e8daf882790454bb",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"BET €0.20\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.036Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-8749fe7520fd9516b9c5",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"€1,234.56\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.052Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-37baea70247a63d4e6b3",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"1.234,56 €\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.067Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-bc55834b264bcdaabd33",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"EUR 10\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.082Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-a02bf470d4673f508fa2",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"CRÉDITO S/ 99.80\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.098Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-a50221c6f9ecf08579b8",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"APUESTA S/. 0.5\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.114Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-55832bd3366b16415c7e",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"PEN 2,500.00\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.130Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-5e5a2808672628341168",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "\"1 234,50\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.146Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-3055cf3f13dae98009ce",
+              "file": "tests/unit/money.spec.ts",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "returns null when there is no number",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.161Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5b279863a359564d2d6d-d587376fa8dd083a624e",
+              "file": "tests/unit/money.spec.ts",
+              "line": 23,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\motion.spec.ts",
+      "file": "tests/unit/motion.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "reel motion",
+          "file": "tests/unit/motion.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "identical frames: no motion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 199,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.195Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "472f259022e25a651642-f966740f04e2132e2e79",
+              "file": "tests/unit/motion.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "brightness shift and recompression are not motion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 340,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.416Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "472f259022e25a651642-396d8fd05659a397cc1a",
+              "file": "tests/unit/motion.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "a single reel still spinning (blurred) is motion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 332,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:20.771Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "472f259022e25a651642-84e7262e43aa1c2e99bf",
+              "file": "tests/unit/motion.spec.ts",
+              "line": 28,
+              "column": 3
+            },
+            {
+              "title": "new symbols on the reels are motion, with a diff image for the report",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 325,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:21.126Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "reel diff",
+                          "contentType": "image/png",
+                          "path": "files/0049-reel-diff.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "472f259022e25a651642-8da3ede7d1b51a4fe812",
+              "file": "tests/unit/motion.spec.ts",
+              "line": 37,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\spin-tracker.spec.ts",
+      "file": "tests/unit/spin-tracker.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "losing spin: starts, stops, settles with payout 0",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.490Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-955b41cfa4dac62dea87",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 18,
+          "column": 1
+        },
+        {
+          "title": "winning spin: stops on the win text even while win animations keep moving, waits for the credit count-up",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.506Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-dc4c2488bc5e32e65b79",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 31,
+          "column": 1
+        },
+        {
+          "title": "no reaction: stays armed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.523Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-02d2e59659f751895e47",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a pop-up appearing (one frame of motion) is not a spin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.539Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-543214c2e97a265cfc8b",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "start is detected from the wager deduction alone when the status text is unreadable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.554Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-415e7713256139e8695c",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "does not call the reels stopped without ever having seen them move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.569Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-0ede5bc3a70dacadef89",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 66,
+          "column": 1
+        },
+        {
+          "title": "a win left on screen by the previous spin is not this spin's payout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.585Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a4b45ba051d180ba65ae-c9151fbd07ea151547d2",
+          "file": "tests/unit/spin-tracker.spec.ts",
+          "line": 75,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\spin-watcher.spec.ts",
+      "file": "tests/unit/spin-watcher.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "records a full winning spin with key frames",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 677,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:21.616Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0ccc80ce743707012221-b4184292c6996b3d4afc",
+          "file": "tests/unit/spin-watcher.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "times out without a start when the game never reacts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "unit",
+              "projectName": "unit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 339,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T14:36:22.320Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0ccc80ce743707012221-e6a1237bafa1f656aaa7",
+          "file": "tests/unit/spin-watcher.spec.ts",
+          "line": 55,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "tests\\unit\\vision.spec.ts",
+      "file": "tests/unit/vision.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "vision on Wolf Gold screenshots",
+          "file": "tests/unit/vision.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "HUD: wolf-gold-practice-spinning.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 516,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:22.703Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "money region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0050-money-region-OCR-input.png"
+                        },
+                        {
+                          "name": "status region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0051-status-region-OCR-input.png"
+                        },
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0052-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-c6dbaf5f511c2b08951a",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            {
+              "title": "HUD: wolf-gold-practice-win.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 421,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:24.117Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "money region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0053-money-region-OCR-input.png"
+                        },
+                        {
+                          "name": "status region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0054-status-region-OCR-input.png"
+                        },
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0055-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-def8438e3a1025523639",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            {
+              "title": "HUD: wolf-gold-real-idle.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 400,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:24.563Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "money region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0056-money-region-OCR-input.png"
+                        },
+                        {
+                          "name": "status region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0057-status-region-OCR-input.png"
+                        },
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0058-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-cc8e23667364db1685f0",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            {
+              "title": "HUD: wolf-gold-intro.webp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1239,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:24.986Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "money region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0059-money-region-OCR-input.png"
+                        },
+                        {
+                          "name": "status region (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0060-status-region-OCR-input.png"
+                        },
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0061-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-6ba829c6fcd3f9c16268",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            {
+              "title": "message: wolf-gold-insufficient-funds.png",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1592,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:26.275Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "message (OCR input)",
+                          "contentType": "image/png",
+                          "path": "files/0062-message-OCR-input.png"
+                        },
+                        {
+                          "name": "ocr text",
+                          "contentType": "text/plain",
+                          "path": "files/0063-ocr-text.txt"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-a752d67dee4110fd9e57",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "locates the ACEPTAR button by reading its caption",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "unit",
+                  "projectName": "unit",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7234,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDJ4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        },
+                        {
+                          "buffer": "SW1hZ2UgdG9vIHNtYWxsIHRvIHNjYWxlISEgKDF4MzYgdnMgbWluIHdpZHRoIG9mIDMpCg=="
+                        },
+                        {
+                          "buffer": "TGluZSBjYW5ub3QgYmUgcmVjb2duaXplZCEhCg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-15T14:36:27.891Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "omitted": "trace: holds session cookies/tokens; open it locally with npx playwright show-trace"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "25472900828a21a5e34e-20b60aa694882b577a9c",
+              "file": "tests/unit/vision.spec.ts",
+              "line": 61,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-15T14:36:03.800Z",
+    "duration": 31444.56,
+    "expected": 66,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

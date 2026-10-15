@@ -1,0 +1,5 @@
+variant: threshold
+confidence: 81
+
+y, CRÉDITO 0,00 €
++ APUESTA 2,00 €

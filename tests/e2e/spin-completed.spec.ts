@@ -10,9 +10,13 @@ import { Checks } from '../../src/reporting/checks';
 
 const C = SCENARIOS.spinCompleted.checks;
 
-test.use({ account: 'FUNDED' });
+// Playwright's own trace/video/screenshots would record its idle launched browser (blank pages):
+// the hand-logged-in tab is traced by the page fixture instead.
+test.use({ account: 'FUNDED', trace: 'off', video: 'off', screenshot: 'off' });
 
 test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanceMenu, gamePage, hudReader }, testInfo) => {
+  // A bonus round can add a few minutes to the spin.
+  test.setTimeout(10 * 60_000);
   const checks = new Checks(testInfo);
   const money = (cents: number | null) => (cents === null ? 'not read' : formatMoney({ cents, currency: market.currency }, market.locale));
   const rule = (r: BalanceCheck) =>
@@ -32,6 +36,7 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   );
 
   await test.step('Launch the Pragmatic Play game', () => gamePage.open());
+  await attachJson(testInfo, 'Game session (DGOJ)', gamePage.gameSessionPasses);
   const mode = await test.step('Enter Real Play', () => gamePage.ensureRealPlay());
   await attachJson(testInfo, 'Play mode', mode);
   await checks.verify(
@@ -76,10 +81,18 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
       intervalMs: 300,
       startTimeoutMs: 15_000,
       timeoutMs: 90_000,
+      // Bonus rounds (free spins after three scatters): press the "pulse en cualquier parte" screens
+      // like a player and wait for the round to finish, so the payout is the bonus total.
+      readPrompt: async (frame) => (await hudReader.readContinuePrompt(frame)).shown,
+      pressToContinue: () => gamePage.clickRegion(game.regions.bonusContinue),
+      bonusTimeoutMs: 300_000,
     }),
   );
   await attachSpin(testInfo, 'Spin', spin);
   const outcome = spin.outcome;
+  if (outcome.bonus) {
+    testInfo.annotations.push({ type: 'bonus', description: `bonus round played; prompts pressed: ${spin.bonusPresses}` });
+  }
 
   await checks.verify(
     C.spinStarted,

@@ -1,0 +1,91 @@
+{
+  "framesObserved": 5,
+  "timedOut": false,
+  "bonusPresses": 0,
+  "phase": "settled",
+  "started": true,
+  "stopped": true,
+  "settled": true,
+  "startSignals": [
+    "status-text",
+    "wager-deducted",
+    "reel-motion"
+  ],
+  "baseline": {
+    "creditCents": 9855,
+    "betCents": 25
+  },
+  "creditAfterWagerCents": 9830,
+  "finalCreditCents": 9835,
+  "payoutCents": 5,
+  "payoutFromCreditCents": 5,
+  "bonus": false,
+  "changes": [
+    {
+      "atMs": 1383,
+      "from": "armed",
+      "to": "spinning",
+      "reason": "game reacted: status-text, wager-deducted"
+    },
+    {
+      "atMs": 4873,
+      "from": "spinning",
+      "to": "stopped",
+      "reason": "status line shows a win"
+    },
+    {
+      "atMs": 6209,
+      "from": "stopped",
+      "to": "settled",
+      "reason": "credit stable at 9835 cents for 2 reads"
+    }
+  ],
+  "keyFrames": [
+    {
+      "phase": "armed",
+      "reason": "before spin",
+      "atMs": 0,
+      "motionRatio": null,
+      "hud": null
+    },
+    {
+      "phase": "spinning",
+      "reason": "game reacted: status-text, wager-deducted",
+      "atMs": 1383,
+      "motionRatio": 0.2839756944444444,
+      "hud": {
+        "status": "spinning",
+        "credit": 9830,
+        "bet": 25,
+        "win": null,
+        "currency": "EUR"
+      }
+    },
+    {
+      "phase": "stopped",
+      "reason": "status line shows a win",
+      "atMs": 4873,
+      "motionRatio": 0.05493055555555556,
+      "hud": {
+        "status": "win",
+        "credit": 9835,
+        "bet": 25,
+        "win": 5,
+        "currency": "EUR"
+      }
+    },
+    {
+      "phase": "settled",
+      "reason": "credit stable at 9835 cents for 2 reads",
+      "atMs": 6209,
+      "motionRatio": 0.05314236111111111,
+      "hud": {
+        "status": "win",
+        "credit": 9835,
+        "bet": 25,
+        "win": 5,
+        "currency": "EUR"
+      }
+    }
+  ]
+}

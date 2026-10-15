@@ -10,7 +10,8 @@
     "reels": { "x": 0.08, "y": 0.13, "w": 0.84, "h": 0.72 },
     "spinButton": { "x": 0.72, "y": 0.81, "w": 0.1, "h": 0.17 },
     "betDown": { "x": 0.675, "y": 0.865, "w": 0.04, "h": 0.07 },
-    "continueButton": { "x": 0.46, "y": 0.77, "w": 0.08, "h": 0.13 }
+    "continueButton": { "x": 0.46, "y": 0.77, "w": 0.08, "h": 0.13 },
+    "bonusContinue": { "x": 0.45, "y": 0.4, "w": 0.1, "h": 0.1 }
   },
   "texts": {
     "es": {
@@ -19,7 +20,10 @@
       "win": ["ganancia"],
       "idle": ["haga su apuesta"],
       "spinning": ["buena suerte"],
-      "dismiss": ["aceptar"]
+      "dismiss": ["aceptar"],
+      "linePays": ["abona"],
+      "bonusActive": ["tiradas gratis restantes", "respins restantes"],
+      "pressToContinue": ["pulse en cualquier parte", "para continuar"]
     },
     "en": {
       "credit": ["credit"],
@@ -27,7 +31,10 @@
       "win": ["win"],
       "idle": ["place your bets"],
       "spinning": ["good luck"],
-      "dismiss": ["ok"]
+      "dismiss": ["ok"],
+      "linePays": ["pays"],
+      "bonusActive": ["free spins left", "respins left"],
+      "pressToContinue": ["press anywhere", "to continue"]
     }
   }
 }

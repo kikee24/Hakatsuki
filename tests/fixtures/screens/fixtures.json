@@ -26,5 +26,22 @@
       "file": "wolf-gold-insufficient-funds.png",
       "expectedKeyword": "fondos insuficientes"
     }
+  ],
+  "bonus": [
+    {
+      "file": "wolf-gold-free-spins.webp",
+      "gameBox": { "left": 112, "top": 285, "width": 814, "height": 459 },
+      "expected": { "bonusActive": true, "asksToContinue": false }
+    },
+    {
+      "file": "wolf-gold-free-spins-end.webp",
+      "gameBox": { "left": 112, "top": 285, "width": 814, "height": 459 },
+      "expected": { "bonusActive": true, "asksToContinue": true }
+    },
+    {
+      "file": "wolf-gold-after-free-spins.webp",
+      "gameBox": { "left": 112, "top": 285, "width": 814, "height": 459 },
+      "expected": { "bonusActive": false, "asksToContinue": false }
+    }
   ]
 }
