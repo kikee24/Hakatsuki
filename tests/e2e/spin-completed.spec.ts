@@ -1,7 +1,7 @@
 import { lobbyUrl } from '../../src/config/market';
 import { reconcileBalance, type BalanceCheck } from '../../src/domain/balance-rule';
 import { formatMoney } from '../../src/domain/money';
-import { attachHud, attachJson, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
+import { attachGameEntry, attachHud, attachJson, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
 import { requireCreditAndBet } from '../../src/game/hud';
 import { watchSpin } from '../../src/game/spin-watcher';
 import { expect, test } from '../../src/fixtures';
@@ -51,6 +51,7 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   );
 
   await test.step('Wait until the game HUD is readable', () => gamePage.waitUntilReady(hudReader));
+  await attachGameEntry(testInfo, gamePage);
   const ready = await test.step('Lower the bet to the minimum', () => gamePage.lowerBetToMinimum(hudReader));
   const beforeFrame = await gamePage.capture();
   await attachHud(testInfo, 'HUD before spin', ready, beforeFrame);
