@@ -1,6 +1,6 @@
 import { gameTexts, type GameConfig, type GameTexts, type Region } from '../config/game';
 import type { OcrEngine, OcrResult, TextLocation } from '../vision/ocr';
-import { readMoneyBlock, readStatusLine, type HudReading } from './hud';
+import { asksToContinue, bonusActive, readMoneyBlock, readStatusLine, type HudReading } from './hud';
 
 export interface HudSnapshot extends HudReading {
   /** Raw OCR for each region, so a report can show exactly what was read and from which pixels. */
@@ -32,8 +32,15 @@ export class HudReader {
     return {
       ...readMoneyBlock(money.text, this.texts),
       ...readStatusLine(status.text, this.texts),
+      bonus: bonusActive(status.text, this.texts),
       ocr: { money, status },
     };
+  }
+
+  /** Whether a bonus screen is waiting for the player ("pulse en cualquier parte para continuar"). */
+  async readContinuePrompt(gameImage: Buffer): Promise<{ shown: boolean; ocr: OcrResult }> {
+    const ocr = await this.ocr.readRegion(gameImage, this.game.regions.message, (text) => asksToContinue(text, this.texts));
+    return { shown: asksToContinue(ocr.text, this.texts), ocr };
   }
 
   /** Text of a pop-up message (e.g. insufficient funds). Defaults to the game's message area. */

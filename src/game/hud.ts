@@ -11,6 +11,8 @@ export interface HudReading {
   /** Amount shown after a winning spin; null when the status line shows no win. */
   win: Money | null;
   status: SpinStatus;
+  /** A bonus round is still running (free spins / respins left), or the game waits on a bonus prompt. */
+  bonus?: boolean;
 }
 
 /**
@@ -40,6 +42,19 @@ export function requireCreditAndBet(hud: HudReading): { credit: Money; bet: Mone
     throw new Error(`Could not read the in-game ${missing} on screen.`);
   }
   return { credit: hud.credit, bet: hud.bet };
+}
+
+/**
+ * "TIRADAS GRATIS RESTANTES 2" while free spins are still being played. After the round the line
+ * reads "TIRADAS GRATIS COMPLETADAS", which does not count: the bonus is over.
+ */
+export function bonusActive(text: string, texts: GameTexts): boolean {
+  return texts.bonusActive.some((p) => fuzzyContains(text, p));
+}
+
+/** "PULSE EN CUALQUIER PARTE PARA CONTINUAR": a bonus screen waiting for the player to press. */
+export function asksToContinue(text: string, texts: GameTexts): boolean {
+  return texts.pressToContinue.some((p) => fuzzyContains(text, p));
 }
 
 export function readStatusLine(text: string, texts: GameTexts): Pick<HudReading, 'status' | 'win'> {

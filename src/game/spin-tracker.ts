@@ -5,7 +5,11 @@ import type { HudReading } from './hud';
  * armed    → Spin was requested, nothing has happened yet.
  * spinning → The game visibly reacted (see StartSignal).
  * stopped  → Reels are still, or the status line already shows a win.
- * settled  → Credit has stopped changing (win count-up finished): the result can be read.
+ * settled  → Credit has stopped changing (win count-up finished) and no bonus round is running:
+ *            the result can be read.
+ *
+ * A bonus (e.g. Wolf Gold's free spins after three scatters) keeps the spin in "stopped" until the
+ * round is over, so the payout is the bonus total and not the scatter win that triggered it.
  */
 export type SpinPhase = 'armed' | 'spinning' | 'stopped' | 'settled';
 
@@ -54,6 +58,8 @@ export interface SpinOutcome {
   finalCreditCents: number | null;
   /** Win shown by the game once the reels stopped; 0 for a losing spin. */
   payoutCents: number;
+  /** A bonus round was seen during this spin. */
+  bonus: boolean;
   changes: PhaseChange[];
 }
 
@@ -72,6 +78,7 @@ export class SpinTracker {
   private creditAfterWager: number | null = null;
   private finalCredit: number | null = null;
   private payout = 0;
+  private bonusSeen = false;
 
   constructor(
     private readonly baseline: SpinBaseline,
@@ -88,6 +95,7 @@ export class SpinTracker {
     const moving = motionRatio !== null && motionRatio > this.options.motionThreshold;
     this.movingStreak = moving ? this.movingStreak + 1 : 0;
     const credit = hud.credit?.cents ?? null;
+    if (hud.bonus) this.bonusSeen = true;
 
     if (this.current === 'armed' || this.current === 'spinning') {
       if (hud.status === 'spinning') this.signals.add('status-text');
@@ -122,12 +130,25 @@ export class SpinTracker {
       if (hud.win) this.payout = hud.win.cents;
       this.stableStreak = credit !== null && credit === this.lastCredit ? this.stableStreak + 1 : credit !== null ? 1 : 0;
       this.lastCredit = credit;
-      if (this.stableStreak >= this.options.stableReads && hud.status !== 'spinning') {
+      if (this.stableStreak >= this.options.stableReads && hud.status !== 'spinning' && !hud.bonus) {
         this.finalCredit = credit;
         this.moveTo('settled', atMs, `credit stable at ${credit} cents for ${this.stableStreak} reads`);
       }
     }
     return this.current;
+  }
+
+  /**
+   * A bonus showed up after the spin looked settled (e.g. the free-spins screen a few seconds after
+   * the scatter win): go back to "stopped" and wait for the round to finish.
+   */
+  reopen(atMs: number, reason: string): void {
+    if (this.current !== 'settled') return;
+    this.bonusSeen = true;
+    this.finalCredit = null;
+    this.stableStreak = 0;
+    this.lastCredit = null;
+    this.moveTo('stopped', atMs, reason);
   }
 
   get outcome(): SpinOutcome {
@@ -141,6 +162,7 @@ export class SpinTracker {
       creditAfterWagerCents: this.creditAfterWager,
       finalCreditCents: this.finalCredit,
       payoutCents: this.payout,
+      bonus: this.bonusSeen,
       changes: [...this.changes],
     };
   }
