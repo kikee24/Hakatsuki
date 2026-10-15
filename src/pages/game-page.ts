@@ -1,0 +1,117 @@
+import type { Page } from '@playwright/test';
+import type { GameConfig, Region } from '../config/game';
+import { marketUi, type MarketConfig, type MarketUi } from '../config/market';
+import type { HudReader, HudSnapshot } from '../game/hud-reader';
+
+export interface PlayMode {
+  real: boolean;
+  /** The "modo Práctica" bar above the game is not shown. */
+  practiceBannerHidden: boolean;
+  /** The launcher URL Betsson builds says forReal=true. */
+  launcherForReal: boolean;
+  launcherProvider: string | null;
+}
+
+/**
+ * Betsson game page. Everything outside the game (banner, launcher iframe) is DOM; everything
+ * inside the game is a canvas, so this class only clicks inside it at configured regions and
+ * leaves every judgement about what happened to the vision code.
+ */
+export class GamePage {
+  private readonly ui: MarketUi;
+
+  constructor(
+    private readonly page: Page,
+    private readonly market: MarketConfig,
+    private readonly game: GameConfig,
+  ) {
+    this.ui = marketUi(market);
+  }
+
+  /** The Betsson launcher iframe that hosts the provider game (it lives in shadow DOM). */
+  get frame() {
+    return this.page.locator('iframe[src*="Gamelauncher"]').first();
+  }
+
+  private get practiceBanner() {
+    return this.page.getByText(this.ui.practiceBanner).first();
+  }
+
+  async open(): Promise<void> {
+    await this.page.goto(new URL(this.game.path, this.market.baseUrl).toString());
+    await this.frame.waitFor({ state: 'visible', timeout: 60_000 });
+  }
+
+  /** Switches from practice to real money if Betsson opened the game in practice mode. */
+  async ensureRealPlay(): Promise<PlayMode> {
+    if (await this.practiceBanner.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await this.page.getByText(this.ui.realModeLink).first().click();
+      await this.practiceBanner.waitFor({ state: 'hidden', timeout: 30_000 });
+      await this.frame.waitFor({ state: 'visible', timeout: 60_000 });
+    }
+    return this.playMode();
+  }
+
+  async playMode(): Promise<PlayMode> {
+    const practiceBannerHidden = !(await this.practiceBanner.isVisible());
+    const src = (await this.frame.getAttribute('src')) ?? '';
+    const params = new URL(src, this.market.baseUrl).searchParams;
+    const launcherForReal = params.get('forReal') === 'true';
+    return {
+      real: practiceBannerHidden && launcherForReal,
+      practiceBannerHidden,
+      launcherForReal,
+      launcherProvider: params.get('provider'),
+    };
+  }
+
+  /** Screenshot of the game frame only: the input for every visual check. */
+  async capture(): Promise<Buffer> {
+    return this.frame.screenshot();
+  }
+
+  /** Clicks the centre of a region of the game frame (the canvas has no DOM controls). */
+  async clickRegion(region: Region): Promise<void> {
+    const box = await this.frame.boundingBox();
+    if (!box) throw new Error('Game frame is not visible.');
+    await this.page.mouse.click(box.x + (region.x + region.w / 2) * box.width, box.y + (region.y + region.h / 2) * box.height);
+  }
+
+  async clickSpin(): Promise<void> {
+    await this.clickRegion(this.game.regions.spinButton);
+  }
+
+  /**
+   * Waits until the HUD is readable (credit and bet visible), passing the intro splash if shown.
+   * "Ready" is decided by reading the screen, not by the click succeeding.
+   */
+  async waitUntilReady(reader: HudReader, timeoutMs = 90_000): Promise<HudSnapshot> {
+    const deadline = Date.now() + timeoutMs;
+    let lastIntroClick = 0;
+    for (;;) {
+      const hud = await reader.read(await this.capture());
+      if (hud.credit && hud.bet) return hud;
+      if (Date.now() > deadline) throw new Error('Game HUD never became readable (credit/bet not found on screen).');
+      // Loading or intro splash: press the continue button now and then, never in a tight loop.
+      if (Date.now() - lastIntroClick > 5_000) {
+        await this.clickRegion(this.game.regions.continueButton);
+        lastIntroClick = Date.now();
+      }
+      await this.page.waitForTimeout(1_000);
+    }
+  }
+
+  /** Presses "−" until the bet read on screen stops going down, to spend as little as possible. */
+  async lowerBetToMinimum(reader: HudReader, maxClicks = 20): Promise<HudSnapshot> {
+    let hud = await reader.read(await this.capture());
+    for (let i = 0; i < maxClicks; i++) {
+      const before = hud.bet?.cents;
+      await this.clickRegion(this.game.regions.betDown);
+      await this.page.waitForTimeout(400);
+      hud = await reader.read(await this.capture());
+      if (hud.bet?.cents === before) break;
+    }
+    if (!hud.bet) throw new Error('Bet is not readable after lowering it.');
+    return hud;
+  }
+}

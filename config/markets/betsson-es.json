@@ -14,5 +14,14 @@
     "no tienes suficiente saldo",
     "no tiene suficiente saldo",
     "no hay suficientes fondos"
-  ]
+  ],
+  "ui": {
+    "loginButton": "Iniciar sesión",
+    "loginBlocked": "vuelve a intentarlo en breve",
+    "balanceButton": "Saldo",
+    "withdrawableLabel": "Disponible para retirar",
+    "bonusLabel": "Bono",
+    "practiceBanner": "modo Práctica",
+    "realModeLink": "Quiero jugar en modo real"
+  }
 }

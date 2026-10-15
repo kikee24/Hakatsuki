@@ -29,6 +29,10 @@ const GameSchema = z.object({
     message: RegionSchema,
     reels: RegionSchema,
     spinButton: RegionSchema,
+    /** "−" button that lowers the bet. */
+    betDown: RegionSchema,
+    /** Round button on the intro splash that enters the game. */
+    continueButton: RegionSchema,
   }),
   texts: z.record(z.string(), GameTextsSchema),
 });

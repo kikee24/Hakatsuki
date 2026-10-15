@@ -14,9 +14,27 @@ const MarketSchema = z.object({
   currency: z.enum(Object.keys(CURRENCIES) as [keyof typeof CURRENCIES, ...(keyof typeof CURRENCIES)[]]),
   envPrefix: z.string().regex(/^[A-Z0-9_]+$/),
   insufficientFundsKeywords: z.array(z.string()).min(1),
+  /** Visible Betsson texts the page objects rely on. Only filled in for markets we have explored. */
+  ui: z
+    .object({
+      loginButton: z.string(),
+      loginBlocked: z.string(),
+      balanceButton: z.string(),
+      withdrawableLabel: z.string(),
+      bonusLabel: z.string(),
+      practiceBanner: z.string(),
+      realModeLink: z.string(),
+    })
+    .optional(),
 });
 
 export type MarketConfig = z.infer<typeof MarketSchema>;
+export type MarketUi = NonNullable<MarketConfig['ui']>;
+
+export function marketUi(market: MarketConfig): MarketUi {
+  if (!market.ui) throw new Error(`Market "${market.id}" has no "ui" texts in its config; explore the site first.`);
+  return market.ui;
+}
 
 export const MARKET_IDS = ['betsson-es', 'betsson-com', 'betsson-pe'] as const;
 export type MarketId = (typeof MARKET_IDS)[number];

@@ -13,9 +13,12 @@ import { join } from 'node:path';
 import { chromium, type Page } from '@playwright/test';
 import { browserChannel } from '../src/config/browser';
 import { getCredentials, type AccountKind } from '../src/config/env';
-import { loadMarket } from '../src/config/market';
+import { loadGame } from '../src/config/game';
+import { loadMarket, marketUi } from '../src/config/market';
+import { CookieBanner } from '../src/pages/cookie-banner';
+import { LoginBlockedError, LoginDialog } from '../src/pages/login-dialog';
 
-const GAME_PATH = '/casino/tragaperras-slots/wolf-gold?gameAction=play';
+const GAME_PATH = loadGame('wolf-gold').path;
 const SAFE_PARAMS = ['lang', 'language', 'currency', 'cur', 'gameSymbol', 'symbol', 'gameId', 'forReal', 'marketCode', 'provider'];
 
 const kind = (process.argv[2]?.toUpperCase() ?? 'FUNDED') as AccountKind;
@@ -38,31 +41,15 @@ function safeUrl(raw: string): string {
   }
 }
 
-async function rejectCookies(page: Page) {
-  try {
-    const direct = page.locator('#onetrust-reject-all-handler');
-    if (await direct.isVisible({ timeout: 5_000 })) return direct.click();
-    await page.locator('#onetrust-pc-btn-handler').click({ timeout: 5_000 });
-    await page.locator('.ot-pc-refuse-all-handler').click({ timeout: 5_000 });
-  } catch {
-    say('Cookie banner not handled automatically (reject it by hand if it shows up).');
-  }
-}
-
 async function login(page: Page) {
-  const { username, password } = getCredentials(market, kind);
-  const email = page.getByTestId('email-input');
+  const dialog = new LoginDialog(page, marketUi(market));
   try {
-    if (!(await email.isVisible({ timeout: 3_000 }))) {
-      await page.getByRole('button', { name: 'Iniciar sesión' }).first().click({ timeout: 10_000 });
-    }
-    await email.fill(username, { timeout: 10_000 });
-    await page.getByTestId('password-input').fill(password);
-    await page.getByTestId('account-login-btn-1-button').click();
-  } catch {
+    await dialog.logIn(getCredentials(market, kind));
+  } catch (err) {
+    if (err instanceof LoginBlockedError) throw err;
     say('Automatic login failed: log in by hand in the browser window.');
+    await dialog.username.waitFor({ state: 'hidden', timeout: 120_000 });
   }
-  await email.waitFor({ state: 'hidden', timeout: 120_000 });
   say('Logged in.');
 }
 
@@ -86,7 +73,7 @@ async function main() {
   });
 
   await page.goto(new URL('/casino', market.baseUrl).toString());
-  await rejectCookies(page);
+  if (!(await new CookieBanner(page).rejectAllIfShown())) say('No cookie banner handled (reject it by hand if shown).');
   await login(page);
   await page.goto(new URL(GAME_PATH, market.baseUrl).toString());
   say('Game page opened. Do not click Spin; just watch.');
