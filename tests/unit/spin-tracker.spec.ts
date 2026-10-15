@@ -98,5 +98,5 @@ test('a losing spin stops when the status line goes back to idle, even if the re
     [hud('idle', 9690), 0.07],
   ]);
   expect(outcome).toMatchObject({ settled: true, payoutCents: 0, finalCreditCents: 9690 });
-  expect(outcome.changes.find((c) => c.to === 'stopped')?.reason).toBe('status line back to idle after spinning');
+  expect(outcome.changes.find((c) => c.to === 'stopped')?.reason).toBe('status line idle after the spin started');
 });

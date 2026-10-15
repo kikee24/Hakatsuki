@@ -52,6 +52,8 @@ export interface SpinWatchOptions {
    */
   idleBaselineMs?: number;
   tracker?: Partial<SpinTrackerOptions>;
+  /** Called with one line per phase change, prompt press and settle check: live progress. */
+  log?: (line: string) => void;
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
 }
@@ -76,6 +78,9 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
   const { intervalMs = 250, startTimeoutMs = 10_000, timeoutMs = 60_000 } = options;
   const { bonusTimeoutMs = 300_000, settleConfirmMs = 4_000, pressIntervalMs = 3_000 } = options;
   const sleep = options.sleep ?? wait;
+  const log = options.log ?? (() => {});
+  const describe = (h: HudReading) =>
+    `status ${h.status}${h.win ? ` win ${h.win.cents}` : ''} credit ${h.credit?.cents ?? '?'}${h.bonus ? ' bonus' : ''}`;
   const now = options.now ?? Date.now;
 
   let previous = await capture();
@@ -118,8 +123,10 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
 
     const changesBefore = tracker.outcome.changes.length;
     const phase = tracker.observe({ atMs, hud, motionRatio: motion.changedRatio });
-    const key = (phaseOf: SpinPhase, reason: string) =>
+    const key = (phaseOf: SpinPhase, reason: string) => {
       keyFrames.push({ phase: phaseOf, reason, atMs, frame, diff: motion.diffImage, motionRatio: motion.changedRatio, hud });
+      log(`${atMs} ms ${phaseOf}: ${reason} | ${describe(hud)} | motion ${(100 * (motion.changedRatio ?? 0)).toFixed(1)}%`);
+    };
     for (const change of tracker.outcome.changes.slice(changesBefore)) key(change.to, change.reason);
     previous = frame;
 
@@ -132,20 +139,30 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
 
     if (phase === 'settled') {
       if (!readPrompt) break;
-      // A bonus screen can follow the win that triggered it (scatters): look again before trusting it.
+      // Look again before trusting it: a bonus screen can follow the win that triggered it
+      // (scatters), and cascading wins can raise the win or the credit after a pause.
       await sleep(settleConfirmMs);
       const check = await capture();
       const checkHud = await readHud(check);
-      if (!checkHud.bonus && !(await readPrompt(check))) break;
+      const bonusNow = checkHud.bonus || (await readPrompt(check));
+      const stillChanging =
+        (checkHud.credit !== null && hud.credit !== null && checkHud.credit.cents !== hud.credit.cents) ||
+        (checkHud.status === 'win' && checkHud.win !== null && checkHud.win.cents !== hud.win?.cents);
+      if (!bonusNow && !stillChanging) break;
       const checkAt = now() - startedAt;
-      tracker.reopen(checkAt, 'bonus round started after the win: waiting for it to finish');
-      keyFrames.push({ phase: 'stopped', reason: 'bonus round started after the win', atMs: checkAt, frame: check, diff: null, motionRatio: null, hud: checkHud });
+      log(`${now() - startedAt} ms settle check: ${bonusNow ? 'bonus' : stillChanging ? 'still changing' : 'confirmed'} | ${describe(checkHud)}`);
+      const reason = bonusNow
+        ? 'bonus round started after the win: waiting for it to finish'
+        : 'win or credit still changing after it looked settled (cascade): waiting';
+      tracker.reopen(checkAt, reason, { bonus: Boolean(bonusNow) });
+      keyFrames.push({ phase: 'stopped', reason, atMs: checkAt, frame: check, diff: null, motionRatio: null, hud: checkHud });
       previous = check;
       continue;
     }
     const elapsed = now() - startedAt;
     const limit = tracker.outcome.bonus ? bonusTimeoutMs : timeoutMs;
     if ((phase === 'armed' && elapsed > startTimeoutMs) || elapsed > limit) {
+      log(`${elapsed} ms timed out in phase ${phase} | ${describe(hud)}`);
       timedOut = true;
       break;
     }

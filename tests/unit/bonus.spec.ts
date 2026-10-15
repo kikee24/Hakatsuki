@@ -127,3 +127,63 @@ test.describe('spin watcher with a bonus round', () => {
     expect(result.keyFrames.some((k) => k.reason.startsWith('bonus round started'))).toBe(true);
   });
 });
+
+test.describe('spin watcher with wins in a cascading game', () => {
+  const eur = (cents: number) => ({ cents, currency: 'EUR' as const });
+  const r = (status: HudReading['status'], credit: number, win: number | null): HudReading => ({
+    status,
+    credit: eur(credit),
+    bet: eur(20),
+    win: win === null ? null : eur(win),
+  });
+  async function watch(script: HudReading[]) {
+    const idle = await gameFrame('bubble-up-real-idle.webp');
+    const spinning = await gameFrame('wolf-gold-practice-spinning.webp');
+    // Alternating frames: the reels look busy the whole time, as in Bubble Up.
+    const frames = script.map((_, i) => (i % 2 ? idle : spinning));
+    let current = -1;
+    let t = 0;
+    return watchSpin({
+      capture: async () => frames[(current = Math.min(current + 1, frames.length - 1))]!,
+      readHud: async () => script[Math.max(0, current)]!,
+      readPrompt: async () => false,
+      pressToContinue: async () => {},
+      trigger: async () => {},
+      baseline: { creditCents: 9015, betCents: 20 },
+      reelsRegion: game.regions.reels,
+      sleep: async () => {},
+      now: () => (t += 500),
+    });
+  }
+
+  test('the same win as the previous spin counts once "¡BUENA SUERTE!" cleared the line', async () => {
+    const result = await watch([
+      r('win', 8995, 30), // previous spin's 0,30 € still shown, wager already taken
+      r('spinning', 8995, null),
+      r('spinning', 8995, null),
+      r('win', 8995, 30), // this spin also pays 0,30 €
+      r('win', 9025, 30),
+      r('win', 9025, 30),
+      r('win', 9025, 30), // settle check
+    ]);
+    expect(result.outcome).toMatchObject({ settled: true, payoutCents: 30, finalCreditCents: 9025 });
+    expect(result.timedOut).toBe(false);
+  });
+
+  test('a cascade that raises the win after a pause reopens the spin and ends on the total', async () => {
+    // The first row is the frame taken before the spin; each later row is one look.
+    const result = await watch([
+      r('spinning', 8995, null),
+      r('spinning', 8995, null),
+      r('win', 8995, 10), // first drop pays 0,10 €
+      r('win', 8995, 10), // looks settled...
+      r('win', 8995, 40), // ...settle check: the cascade added 0,30 €
+      r('win', 9035, 40),
+      r('win', 9035, 40),
+      r('win', 9035, 40), // settle check
+    ]);
+    expect(result.outcome).toMatchObject({ settled: true, bonus: false, payoutCents: 40, finalCreditCents: 9035 });
+    expect(result.keyFrames.some((k) => k.reason.includes('still changing'))).toBe(true);
+    expect(result.outcome.finalCreditCents).toBe(9015 - 20 + result.outcome.payoutCents);
+  });
+});
