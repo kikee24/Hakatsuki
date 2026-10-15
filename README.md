@@ -84,6 +84,23 @@ in session-only cookies and is tied to the device). So **there are no credential
   device, Betsson logs one out. Betsson also allows one session per account, so do not run the
   scenarios from two machines at once with the same accounts.
 
+## Games: adding one and auto-calibration
+
+Run the scenarios on a game with `npm run test:slot -- <game-id>` (default `wolf-gold`; extra
+Playwright arguments go after it). A new Pragmatic Play game only needs
+`config/games/<game-id>.json` with `id`, `name`, `provider` and `path` (its Betsson URL): regions and
+captions it does not list come from `config/games/_pragmatic-defaults.json`.
+
+When the game opens, `GamePage` finds the controls on screen like a player
+(`src/game/calibration.ts`): the round "circular arrows" button by template matching
+(`assets/templates/pragmatic-spin-icon.png`; continue on the intro, spin in the game), the CRÉDITO /
+APUESTA labels by OCR, and from them the money block, status line and "−" bet button. The found
+regions are only used if the HUD then reads the same as with the configured ones (or, for a new
+game, if it reads at all); the frame with the regions drawn is attached as *Auto-calibration*.
+The intro continue button is only pressed when the icon scores ≥ 0.85, a level the in-game spin
+button never reaches, so the spin button is never taken for it. Reels, message and bonus areas
+still come from the config.
+
 ## Game session (DGOJ)
 
 In Spain a regulated *sesión de juego* with time and loss limits must be opened before Real Play

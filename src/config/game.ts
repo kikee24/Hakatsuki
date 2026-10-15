@@ -53,9 +53,24 @@ export type GameConfig = z.infer<typeof GameSchema>;
 
 export const FULL_FRAME: Region = { x: 0, y: 0, w: 1, h: 1 };
 
+type RawGame = { regions?: Record<string, unknown>; texts?: Record<string, Record<string, unknown>> } & Record<string, unknown>;
+
+const readJson = (name: string): RawGame => JSON.parse(readFileSync(resolve(process.cwd(), 'config', 'games', `${name}.json`), 'utf8'));
+
+/**
+ * A game config only needs id, name, provider and path: missing regions and on-screen texts come
+ * from config/games/_pragmatic-defaults.json (Pragmatic Play's standard desktop HUD), and the
+ * controls are also found on screen when the game opens (src/game/calibration.ts).
+ */
 export function loadGame(id: string): GameConfig {
-  const file = resolve(process.cwd(), 'config', 'games', `${id}.json`);
-  return GameSchema.parse(JSON.parse(readFileSync(file, 'utf8')));
+  const raw = readJson(id);
+  const defaults = readJson('_pragmatic-defaults');
+  const languages = new Set([...Object.keys(defaults.texts ?? {}), ...Object.keys(raw.texts ?? {})]);
+  return GameSchema.parse({
+    ...raw,
+    regions: { ...defaults.regions, ...raw.regions },
+    texts: Object.fromEntries([...languages].map((l) => [l, { ...defaults.texts?.[l], ...raw.texts?.[l] }])),
+  });
 }
 
 export function gameTexts(game: GameConfig, language: string): GameTexts {

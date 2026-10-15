@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import type { GameConfig, Region } from '../config/game';
 import { marketUi, type MarketConfig, type MarketUi } from '../config/market';
 import { findKeyword } from '../domain/text-match';
+import { drawRegions, findIntroContinue } from '../game/calibration';
 import type { HudReader, HudSnapshot } from '../game/hud-reader';
 import type { OcrResult } from '../vision/ocr';
 import { GameSessionGate } from './game-session-gate';
@@ -149,17 +150,64 @@ export class GamePage {
   async waitUntilReady(reader: HudReader, timeoutMs = 90_000): Promise<HudSnapshot> {
     const deadline = Date.now() + timeoutMs;
     let lastIntroClick = 0;
+    let lastCalibrationTry = 0;
     for (;;) {
-      const hud = await reader.read(await this.capture());
-      if (hud.credit && hud.bet) return hud;
+      const frame = await this.capture();
+      const hud = await reader.read(frame);
+      if (hud.credit && hud.bet) return (await this.autoCalibrate(frame, reader, hud)) ?? hud;
+      // HUD not readable with the configured regions: maybe they are wrong (new game). Try finding
+      // the controls on screen (about a second of OCR, so not on every frame), unless this is
+      // clearly the intro.
+      const intro = await findIntroContinue(frame);
+      if (!intro && Date.now() - lastCalibrationTry > 4_000) {
+        lastCalibrationTry = Date.now();
+        const calibrated = await this.autoCalibrate(frame, reader, null);
+        if (calibrated) return calibrated;
+      }
       if (Date.now() > deadline) throw new Error('Game HUD never became readable (credit/bet not found on screen).');
       // Loading or intro splash: press the continue button now and then, never in a tight loop.
+      // Where the player sees it if it is on screen, else at the configured position.
       if (Date.now() - lastIntroClick > 5_000) {
-        await this.clickRegion(this.game.regions.continueButton);
+        await this.clickRegion(intro?.region ?? this.game.regions.continueButton);
+        this.introPresses.push(intro ? `continue button found on screen (score ${intro.score.toFixed(2)})` : 'configured continue position');
         lastIntroClick = Date.now();
       }
       await this.page.waitForTimeout(1_000);
     }
+  }
+
+  /** How the intro was passed, for the report. */
+  readonly introPresses: string[] = [];
+  /** What auto-calibration found on the base game, and whether it was used. */
+  calibration: { applied: boolean; reason: string; regions: Partial<Record<string, Region>>; image: Buffer } | null = null;
+
+  /**
+   * Finds the controls on this base-game frame and uses them instead of the configured regions,
+   * but only if the HUD then reads right: the same credit and bet as with the configured regions
+   * (`configured`), or at least a readable credit and bet when the configured ones failed (null).
+   * The regions live in the game config object shared with the HUD reader, so both switch.
+   */
+  private async autoCalibrate(frame: Buffer, reader: HudReader, configured: HudSnapshot | null): Promise<HudSnapshot | null> {
+    if (this.calibration?.applied) return null;
+    const result = await reader.calibrate(frame);
+    if (!result.regions) {
+      this.calibration = { applied: false, reason: `not found: ${result.missing.join(', ')}`, regions: {}, image: frame };
+      return null;
+    }
+    const saved = { ...this.game.regions };
+    Object.assign(this.game.regions, result.regions);
+    const hud = await reader.read(frame);
+    const agrees = configured
+      ? hud.credit?.cents === configured.credit?.cents && hud.bet?.cents === configured.bet?.cents
+      : Boolean(hud.credit && hud.bet);
+    const image = await drawRegions(frame, result.regions);
+    if (!agrees) {
+      Object.assign(this.game.regions, saved);
+      this.calibration = { applied: false, reason: 'the HUD did not read right with the found regions: configured ones kept', regions: result.regions, image };
+      return null;
+    }
+    this.calibration = { applied: true, reason: configured ? 'found on screen, same HUD reading as the configured regions' : 'found on screen (configured regions did not read the HUD)', regions: result.regions, image };
+    return hud;
   }
 
   /** Reads the HUD until credit and bet are both visible, without clicking anything. */
@@ -192,6 +240,11 @@ export class GamePage {
       await this.clickRegion(this.game.regions.betDown);
       await this.page.waitForTimeout(400);
       hud = await reader.read(await this.capture());
+      // The bet going up means the press hit another control (e.g. "+"): stop before spinning
+      // anything, whatever region (configured or found on screen) was used.
+      if (before !== undefined && hud.bet && hud.bet.cents > before) {
+        throw new Error(`The bet went up (${before} → ${hud.bet.cents} cents) when pressing "−": wrong button, not spinning.`);
+      }
       if (hud.bet?.cents === before) break;
     }
     if (!hud.bet) throw new Error('Bet is not readable after lowering it.');

@@ -38,6 +38,11 @@ export interface PhaseChange {
 
 export interface SpinTrackerOptions {
   motionThreshold: number;
+  /**
+   * At or below this the reels count as still. Defaults to motionThreshold; higher for games whose
+   * symbols move at rest, so their idle animation is not taken for spinning reels (watchSpin).
+   */
+  stillThreshold?: number;
   /** Consecutive moving frames needed to count as reel motion (a pop-up appearing moves only one). */
   movingFrames: number;
   /** Consecutive still frames needed to count the reels as stopped. */
@@ -107,7 +112,10 @@ export class SpinTracker {
     const credit = hud.credit?.cents ?? null;
     if (hud.bonus) this.bonusSeen = true;
     if (this.staleWin === undefined) this.staleWin = hud.status === 'win' ? (hud.win?.cents ?? null) : null;
-    const newWin = hud.status === 'win' && hud.win !== null && hud.win.cents !== this.staleWin;
+    // Once "¡BUENA SUERTE!" was seen the line has been cleared, so any win after it is this spin's,
+    // even with the same amount as the previous one (two equal wins in a row).
+    const newWin =
+      hud.status === 'win' && hud.win !== null && (this.signals.has('status-text') || hud.win.cents !== this.staleWin);
 
     if (this.current === 'armed' || this.current === 'spinning') {
       if (hud.status === 'spinning') this.signals.add('status-text');
@@ -124,10 +132,22 @@ export class SpinTracker {
     }
 
     if (this.current === 'spinning') {
-      this.stillStreak = moving || motionRatio === null ? 0 : this.stillStreak + 1;
+      const still = motionRatio !== null && motionRatio <= (this.options.stillThreshold ?? this.options.motionThreshold);
+      this.stillStreak = still ? this.stillStreak + 1 : 0;
       // A win left over from the previous spin does not stop this one: wait for the reels instead.
       if (newWin) {
         this.moveTo('stopped', atMs, 'status line shows a win');
+      } else if (
+        (this.signals.has('status-text') || this.signals.has('wager-deducted')) &&
+        this.signals.has('reel-motion') &&
+        hud.status === 'idle'
+      ) {
+        // The wager was taken (or "¡BUENA SUERTE!" shown, which many Pragmatic games never do),
+        // the reels moved, and the status line reads "¡HAGA SU APUESTA!": the spin is over. Does
+        // not need still reels, which never happens in games whose symbols are always animated
+        // (Bubble Up waited for the 90 s timeout). If this comes too early, the watcher's settle
+        // check reopens the spin when a win or the credit shows up afterwards.
+        this.moveTo('stopped', atMs, 'status line idle after the spin started');
       } else if (
         this.signals.has('reel-motion') &&
         this.stillStreak >= this.options.stillFrames &&
@@ -159,12 +179,13 @@ export class SpinTracker {
   }
 
   /**
-   * A bonus showed up after the spin looked settled (e.g. the free-spins screen a few seconds after
-   * the scatter win): go back to "stopped" and wait for the round to finish.
+   * The result was still changing after the spin looked settled: a bonus showed up (e.g. the
+   * free-spins screen a few seconds after the scatter win; `bonus`, the default) or the win/credit
+   * moved on (cascading wins, `bonus: false`). Go back to "stopped" and wait for the end.
    */
-  reopen(atMs: number, reason: string): void {
+  reopen(atMs: number, reason: string, { bonus = true }: { bonus?: boolean } = {}): void {
     if (this.current !== 'settled') return;
-    this.bonusSeen = true;
+    if (bonus) this.bonusSeen = true;
     this.finalCredit = null;
     this.stableStreak = 0;
     this.lastCredit = null;

@@ -50,6 +50,9 @@ export async function attachSpin(testInfo: TestInfo, label: string, result: Spin
     framesObserved: result.framesObserved,
     timedOut: result.timedOut,
     bonusPresses: result.bonusPresses,
+    idleMotionRatio: result.idleMotionRatio,
+    motionThreshold: result.motionThreshold,
+    stillThreshold: result.stillThreshold,
     ...result.outcome,
     keyFrames: result.keyFrames.map((k) => ({
       phase: k.phase,
@@ -59,4 +62,17 @@ export async function attachSpin(testInfo: TestInfo, label: string, result: Spin
       hud: k.hud ? hudValues(k.hud) : null,
     })),
   });
+}
+
+/** How the game was entered: intro presses and what auto-calibration found on screen (GamePage). */
+export async function attachGameEntry(
+  testInfo: TestInfo,
+  gamePage: { introPresses: readonly string[]; calibration: { applied: boolean; reason: string; regions: unknown; image: Buffer } | null },
+): Promise<void> {
+  if (gamePage.introPresses.length) await attachJson(testInfo, 'Intro', gamePage.introPresses);
+  const c = gamePage.calibration;
+  if (!c) return;
+  await attachPng(testInfo, `Auto-calibration — ${c.applied ? 'regions found on screen' : 'not used'}`, c.image);
+  await attachJson(testInfo, 'Auto-calibration', { applied: c.applied, reason: c.reason, regions: c.regions });
+  testInfo.annotations.push({ type: 'auto-calibration', description: `${c.applied ? 'used' : 'not used'}: ${c.reason}` });
 }

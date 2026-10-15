@@ -1,7 +1,7 @@
 import { lobbyUrl } from '../../src/config/market';
 import { reconcileBalance, type BalanceCheck } from '../../src/domain/balance-rule';
 import { formatMoney } from '../../src/domain/money';
-import { attachHud, attachJson, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
+import { attachGameEntry, attachHud, attachJson, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
 import { requireCreditAndBet } from '../../src/game/hud';
 import { watchSpin } from '../../src/game/spin-watcher';
 import { expect, test } from '../../src/fixtures';
@@ -51,6 +51,7 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   );
 
   await test.step('Wait until the game HUD is readable', () => gamePage.waitUntilReady(hudReader));
+  await attachGameEntry(testInfo, gamePage);
   const ready = await test.step('Lower the bet to the minimum', () => gamePage.lowerBetToMinimum(hudReader));
   const beforeFrame = await gamePage.capture();
   await attachHud(testInfo, 'HUD before spin', ready, beforeFrame);
@@ -86,6 +87,10 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
       readPrompt: async (frame) => (await hudReader.readContinuePrompt(frame)).shown,
       pressToContinue: () => gamePage.clickRegion(game.regions.bonusContinue),
       bonusTimeoutMs: 300_000,
+      // Games with always-animated symbols: judge motion against the reels at rest.
+      idleBaselineMs: 300,
+      // Live progress in the console: what the watcher sees and waits for.
+      log: (line) => console.log(`[spin] ${line}`),
     }),
   );
   await attachSpin(testInfo, 'Spin', spin);
@@ -119,9 +124,11 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   await checks.verify(C.inGameRule, () => expect.soft(inGame.ok).toBe(true), rule(inGame));
 
   const expectedBetsson = betssonBefore.withdrawable.cents - bet.cents + outcome.payoutCents;
-  const betssonAfter = await test.step('Read the Betsson balance after the spin', () =>
-    balanceMenu.readUntil((b) => b.withdrawable.cents === expectedBetsson),
+  const afterRead = await test.step('Read the Betsson balance after the spin', () =>
+    balanceMenu.readAfterSpin(betssonBefore.withdrawable.cents, expectedBetsson),
   );
+  const betssonAfter = afterRead.balance;
+  testInfo.annotations.push({ type: 'betsson-balance-after', description: `${afterRead.reads} read(s), ended: ${afterRead.ended}` });
   await attachPng(testInfo, 'Betsson balance after', betssonAfter.evidence);
   const betsson = reconcileBalance({
     beforeCents: betssonBefore.withdrawable.cents,

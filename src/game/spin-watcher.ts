@@ -1,5 +1,5 @@
 import type { Region } from '../config/game';
-import { compareFrames } from '../vision/motion';
+import { compareFrames, MOTION_THRESHOLD } from '../vision/motion';
 import type { HudReading } from './hud';
 import {
   SpinTracker,
@@ -46,7 +46,14 @@ export interface SpinWatchOptions {
   settleConfirmMs?: number;
   /** Minimum time between two presses on a bonus prompt. */
   pressIntervalMs?: number;
+  /**
+   * Measure the reels' own motion at rest (two frames this far apart, before the spin) and require
+   * clearly more to call them moving: some games animate their symbols all the time (Bubble Up).
+   */
+  idleBaselineMs?: number;
   tracker?: Partial<SpinTrackerOptions>;
+  /** Called with one line per phase change, prompt press and settle check: live progress. */
+  log?: (line: string) => void;
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
 }
@@ -59,6 +66,10 @@ export interface SpinWatchResult {
   timedOut: boolean;
   /** Times a bonus prompt was pressed to continue. */
   bonusPresses: number;
+  /** Reel motion at rest measured before the spin (idleBaselineMs), and the thresholds used. */
+  idleMotionRatio: number | null;
+  motionThreshold: number;
+  stillThreshold: number;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -68,10 +79,27 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
   const { intervalMs = 250, startTimeoutMs = 10_000, timeoutMs = 60_000 } = options;
   const { bonusTimeoutMs = 300_000, settleConfirmMs = 4_000, pressIntervalMs = 3_000 } = options;
   const sleep = options.sleep ?? wait;
+  const log = options.log ?? (() => {});
+  const describe = (h: HudReading) =>
+    `status ${h.status}${h.win ? ` win ${h.win.cents}` : ''} credit ${h.credit?.cents ?? '?'}${h.bonus ? ' bonus' : ''}`;
   const now = options.now ?? Date.now;
 
-  const tracker = new SpinTracker(baseline, options.tracker);
   let previous = await capture();
+  let idleMotionRatio: number | null = null;
+  if (options.idleBaselineMs) {
+    await sleep(options.idleBaselineMs);
+    const second = await capture();
+    idleMotionRatio = (await compareFrames(previous, second, reelsRegion)).changedRatio;
+    previous = second;
+  }
+  // "Moving" (the spin happened) keeps the normal threshold: any clear motion proves it. "Still" is
+  // judged against what the reels do on their own at rest, so an idle animation is not motion.
+  // (Live, Bubble Up: one raised threshold for both hid the spin itself, and it timed out.)
+  const motionThreshold = options.tracker?.motionThreshold ?? MOTION_THRESHOLD;
+  const stillThreshold = Math.max(motionThreshold, idleMotionRatio === null ? 0 : idleMotionRatio * 2.5 + 0.01);
+  const tracker = new SpinTracker(baseline, { ...options.tracker, motionThreshold, stillThreshold });
+  const pct = (r: number) => `${(100 * r).toFixed(1)}%`;
+  log(`idle reel motion ${idleMotionRatio === null ? 'not measured' : pct(idleMotionRatio)}, moving above ${pct(motionThreshold)}, still at or below ${pct(stillThreshold)}`);
   const keyFrames: KeyFrame[] = [
     { phase: 'armed', reason: 'before spin', atMs: 0, frame: previous, diff: null, motionRatio: null, hud: null },
   ];
@@ -101,8 +129,10 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
 
     const changesBefore = tracker.outcome.changes.length;
     const phase = tracker.observe({ atMs, hud, motionRatio: motion.changedRatio });
-    const key = (phaseOf: SpinPhase, reason: string) =>
+    const key = (phaseOf: SpinPhase, reason: string) => {
       keyFrames.push({ phase: phaseOf, reason, atMs, frame, diff: motion.diffImage, motionRatio: motion.changedRatio, hud });
+      log(`${atMs} ms ${phaseOf}: ${reason} | ${describe(hud)} | motion ${(100 * (motion.changedRatio ?? 0)).toFixed(1)}%`);
+    };
     for (const change of tracker.outcome.changes.slice(changesBefore)) key(change.to, change.reason);
     previous = frame;
 
@@ -115,24 +145,34 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
 
     if (phase === 'settled') {
       if (!readPrompt) break;
-      // A bonus screen can follow the win that triggered it (scatters): look again before trusting it.
+      // Look again before trusting it: a bonus screen can follow the win that triggered it
+      // (scatters), and cascading wins can raise the win or the credit after a pause.
       await sleep(settleConfirmMs);
       const check = await capture();
       const checkHud = await readHud(check);
-      if (!checkHud.bonus && !(await readPrompt(check))) break;
+      const bonusNow = checkHud.bonus || (await readPrompt(check));
+      const stillChanging =
+        (checkHud.credit !== null && hud.credit !== null && checkHud.credit.cents !== hud.credit.cents) ||
+        (checkHud.status === 'win' && checkHud.win !== null && checkHud.win.cents !== hud.win?.cents);
+      if (!bonusNow && !stillChanging) break;
       const checkAt = now() - startedAt;
-      tracker.reopen(checkAt, 'bonus round started after the win: waiting for it to finish');
-      keyFrames.push({ phase: 'stopped', reason: 'bonus round started after the win', atMs: checkAt, frame: check, diff: null, motionRatio: null, hud: checkHud });
+      log(`${now() - startedAt} ms settle check: ${bonusNow ? 'bonus' : stillChanging ? 'still changing' : 'confirmed'} | ${describe(checkHud)}`);
+      const reason = bonusNow
+        ? 'bonus round started after the win: waiting for it to finish'
+        : 'win or credit still changing after it looked settled (cascade): waiting';
+      tracker.reopen(checkAt, reason, { bonus: Boolean(bonusNow) });
+      keyFrames.push({ phase: 'stopped', reason, atMs: checkAt, frame: check, diff: null, motionRatio: null, hud: checkHud });
       previous = check;
       continue;
     }
     const elapsed = now() - startedAt;
     const limit = tracker.outcome.bonus ? bonusTimeoutMs : timeoutMs;
     if ((phase === 'armed' && elapsed > startTimeoutMs) || elapsed > limit) {
+      log(`${elapsed} ms timed out in phase ${phase} | ${describe(hud)}`);
       timedOut = true;
       break;
     }
   }
 
-  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses };
+  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses, idleMotionRatio, motionThreshold, stillThreshold };
 }

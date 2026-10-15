@@ -10,6 +10,8 @@ Betsson (no account, no anti-fraud blocks, works in CI). None of them shows acco
 | `wolf-gold-practice-win.webp` | Practice | `CRÉDITO 99.992,40 €`, `APUESTA 2,00 €`, `GANANCIA 0,40 €`, `LA LÍNEA 12 ABONA 0,40 €` |
 | `wolf-gold-real-idle.webp` | Real | `CRÉDITO 98,90 €`, `APUESTA 2,00 €`, status `¡HAGA SU APUESTA!`, no practice banner |
 | `wolf-gold-insufficient-funds.png` | Real (empty account) | Modal `MENSAJE`: "Fondos insuficientes para realizar esta apuesta…", `ACEPTAR` |
+| `bubble-up-real-idle.webp` | Real (empty account) | Bubble Up base game: `CRÉDITO 0,00 €`, `APUESTA 2,00 €`, `¡HAGA SU APUESTA!` (game frame only) |
+| `bubble-up-intro.webp` | Real | Bubble Up intro: round continue button on the right, under the logo (calibrates `continueButton`) |
 | `wolf-gold-free-spins.webp` | Real | Free spins in progress: `GANANCIA 0,25 €`, `TIRADAS GRATIS RESTANTES 2` |
 | `wolf-gold-free-spins-end.webp` | Real | End of free spins, still in the bonus (`TIRADAS GRATIS RESTANTES 0`): "¡ENHORABUENA! … HA GANADO 1,85 € — PULSE EN CUALQUIER PARTE PARA CONTINUAR" |
 | `wolf-gold-after-free-spins.webp` | Real | Back to the base game: `CRÉDITO 99,15 €`, `TIRADAS GRATIS COMPLETADAS` |

@@ -1,5 +1,6 @@
 import { gameTexts, type GameConfig, type GameTexts, type Region } from '../config/game';
 import type { OcrEngine, OcrResult, TextLocation } from '../vision/ocr';
+import { calibrateBaseGame, type Calibration } from './calibration';
 import { asksToContinue, bonusActive, readMoneyBlock, readStatusLine, type HudReading } from './hud';
 
 export interface HudSnapshot extends HudReading {
@@ -35,6 +36,11 @@ export class HudReader {
       bonus: bonusActive(status.text, this.texts),
       ocr: { money, status },
     };
+  }
+
+  /** Finds this game's controls on a base-game frame (see calibration.ts). */
+  async calibrate(gameImage: Buffer): Promise<Calibration> {
+    return calibrateBaseGame(gameImage, this.ocr, this.texts);
   }
 
   /** Whether a bonus screen is waiting for the player ("pulse en cualquier parte para continuar"). */

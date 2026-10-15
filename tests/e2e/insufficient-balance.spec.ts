@@ -1,7 +1,7 @@
 import { loadMarket, lobbyUrl, MARKET_IDS } from '../../src/config/market';
 import { formatMoney } from '../../src/domain/money';
 import { findKeyword } from '../../src/domain/text-match';
-import { attachHud, attachJson, attachOcr, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
+import { attachGameEntry, attachHud, attachJson, attachOcr, attachPng, attachSpin, hudValues } from '../../src/evidence/attach';
 import { requireCreditAndBet } from '../../src/game/hud';
 import { watchSpin } from '../../src/game/spin-watcher';
 import { expect, test } from '../../src/fixtures';
@@ -50,6 +50,7 @@ test(SCENARIOS.insufficientBalance.title, async ({ page, market, game, cookies, 
   );
 
   const before = await test.step('Wait until the game HUD is readable', () => gamePage.waitUntilReady(hudReader));
+  await attachGameEntry(testInfo, gamePage);
   await attachHud(testInfo, 'HUD before attempt', before, await gamePage.capture());
   const { credit, bet } = requireCreditAndBet(before);
   await checks.verify(

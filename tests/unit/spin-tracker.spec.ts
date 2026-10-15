@@ -87,3 +87,16 @@ test('a win left on screen by the previous spin is not this spin\'s payout', () 
   expect(outcome.startSignals).toEqual(expect.arrayContaining(['wager-deducted', 'reel-motion']));
   expect(outcome.changes.find((c) => c.to === 'stopped')?.reason).not.toBe('status line shows a win');
 });
+
+test('a losing spin stops when the status line goes back to idle, even if the reels never look still', () => {
+  // Bubble Up keeps its symbols animated: motion stays above the threshold after the spin.
+  const outcome = run([
+    [hud('spinning', 9690), 0.5],
+    [hud('spinning', 9690), 0.4],
+    [hud('idle', 9690), 0.06],
+    [hud('idle', 9690), 0.05],
+    [hud('idle', 9690), 0.07],
+  ]);
+  expect(outcome).toMatchObject({ settled: true, payoutCents: 0, finalCreditCents: 9690 });
+  expect(outcome.changes.find((c) => c.to === 'stopped')?.reason).toBe('status line idle after the spin started');
+});
