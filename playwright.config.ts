@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { defineConfig, devices, type Project } from '@playwright/test';
+import { browserChannel } from './src/config/browser';
 import { getProxy } from './src/config/env';
 import { activeMarkets, loadMarket } from './src/config/market';
 import type { MarketOptions } from './src/fixtures';
@@ -11,6 +12,7 @@ const marketProjects: Project<MarketOptions>[] = activeMarkets().map((id) => {
     testDir: './tests/e2e',
     use: {
       ...devices['Desktop Chrome'],
+      channel: browserChannel(),
       // Fixed geometry so screen regions (ROIs) are reproducible between runs and machines.
       viewport: { width: 1280, height: 720 },
       deviceScaleFactor: 1,
