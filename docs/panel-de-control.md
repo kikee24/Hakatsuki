@@ -1,5 +1,10 @@
 # Panel de control de resultados — guía para construirlo
 
+> **Ya implementado**: lo genera `src/reporting/dashboard-reporter.ts` al acabar cada ejecución
+> (`dashboard/index.html`, `npm run report`) y en CI se publica en GitHub Pages. Para generarlo desde
+> una exportación: `npm run report -- docs/panel-sample`. Ver la sección *Results dashboard* del README.
+> Esta guía queda como referencia del formato de los datos.
+
 Objetivo: al terminar una ejecución, lanzar **un comando** (`npm run panel`) que abra un panel con
 apartados de **capturas**, **vídeo** y **tests unitarios**, y que para **cada test** diga **qué hace**,
 **qué ha salido** y si está **bien o mal**.

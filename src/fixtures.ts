@@ -3,6 +3,7 @@ import type { AccountKind } from './config/env';
 import { loadGame, type GameConfig } from './config/game';
 import { loadMarket, marketUi, type MarketConfig } from './config/market';
 import { HudReader } from './game/hud-reader';
+import { LiveRecorder } from './evidence/live-recorder';
 import { BalanceMenu } from './pages/balance-menu';
 import { CookieBanner } from './pages/cookie-banner';
 import { GamePage } from './pages/game-page';
@@ -41,6 +42,7 @@ export const test = base.extend<MarketOptions & Fixtures>({
   // here, so this tab is traced explicitly and attached as "trace" (View trace in the report).
   // That trace holds the live session's network traffic (cookies, tokens): recorded locally only,
   // never in CI where it would end up in an artifact, unless TRACE_LIVE=1.
+  // The tab is also recorded as "video", paused while the balance menu shows the player's name.
   page: async ({ page, account, market, viewport }, use, testInfo) => {
     if (!account) return use(page);
     await ensureLoggedIn(market, account, 2 * 60_000);
@@ -49,15 +51,18 @@ export const test = base.extend<MarketOptions & Fixtures>({
     const traced = !process.env.CI || process.env.TRACE_LIVE === '1';
     if (traced) await context.tracing.start({ screenshots: true, snapshots: true, title: testInfo.title });
     const tab = await context.newPage();
+    let recorder: LiveRecorder | undefined;
     try {
       // Same geometry as the launched browser, so the calibrated game regions apply.
       if (viewport) await tab.setViewportSize(viewport);
+      recorder = await LiveRecorder.start(tab, testInfo, viewport ?? undefined);
       await use(tab);
     } finally {
       if (testInfo.status !== testInfo.expectedStatus) {
         const shot = await tab.screenshot().catch(() => undefined);
         if (shot) await testInfo.attach('screenshot on failure', { body: shot, contentType: 'image/png' });
       }
+      await recorder?.finish().catch(() => undefined);
       if (traced) {
         const path = testInfo.outputPath('trace.zip');
         await context.tracing.stop({ path }).then(
