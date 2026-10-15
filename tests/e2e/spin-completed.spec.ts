@@ -87,6 +87,8 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
       readPrompt: async (frame) => (await hudReader.readContinuePrompt(frame)).shown,
       pressToContinue: () => gamePage.clickRegion(game.regions.bonusContinue),
       bonusTimeoutMs: 300_000,
+      // Games with always-animated symbols: judge motion against the reels at rest.
+      idleBaselineMs: 300,
     }),
   );
   await attachSpin(testInfo, 'Spin', spin);

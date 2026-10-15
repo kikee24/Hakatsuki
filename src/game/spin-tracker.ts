@@ -128,6 +128,11 @@ export class SpinTracker {
       // A win left over from the previous spin does not stop this one: wait for the reels instead.
       if (newWin) {
         this.moveTo('stopped', atMs, 'status line shows a win');
+      } else if (this.signals.has('status-text') && this.signals.has('reel-motion') && hud.status === 'idle') {
+        // "¡BUENA SUERTE!", reels seen moving, then back to "¡HAGA SU APUESTA!": the spin is over
+        // (a losing one). Does not need still reels, which never happens in games whose symbols are
+        // always animated (Bubble Up: a losing spin waited for the 90 s timeout).
+        this.moveTo('stopped', atMs, 'status line back to idle after spinning');
       } else if (
         this.signals.has('reel-motion') &&
         this.stillStreak >= this.options.stillFrames &&

@@ -1,5 +1,5 @@
 import type { Region } from '../config/game';
-import { compareFrames } from '../vision/motion';
+import { compareFrames, MOTION_THRESHOLD } from '../vision/motion';
 import type { HudReading } from './hud';
 import {
   SpinTracker,
@@ -46,6 +46,11 @@ export interface SpinWatchOptions {
   settleConfirmMs?: number;
   /** Minimum time between two presses on a bonus prompt. */
   pressIntervalMs?: number;
+  /**
+   * Measure the reels' own motion at rest (two frames this far apart, before the spin) and require
+   * clearly more to call them moving: some games animate their symbols all the time (Bubble Up).
+   */
+  idleBaselineMs?: number;
   tracker?: Partial<SpinTrackerOptions>;
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
@@ -59,6 +64,9 @@ export interface SpinWatchResult {
   timedOut: boolean;
   /** Times a bonus prompt was pressed to continue. */
   bonusPresses: number;
+  /** Reel motion at rest measured before the spin (idleBaselineMs), and the threshold used. */
+  idleMotionRatio: number | null;
+  motionThreshold: number;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -70,8 +78,17 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
   const sleep = options.sleep ?? wait;
   const now = options.now ?? Date.now;
 
-  const tracker = new SpinTracker(baseline, options.tracker);
   let previous = await capture();
+  let idleMotionRatio: number | null = null;
+  if (options.idleBaselineMs) {
+    await sleep(options.idleBaselineMs);
+    const second = await capture();
+    idleMotionRatio = (await compareFrames(previous, second, reelsRegion)).changedRatio;
+    previous = second;
+  }
+  // Moving = clearly above what the reels do on their own at rest.
+  const motionThreshold = Math.max(options.tracker?.motionThreshold ?? MOTION_THRESHOLD, idleMotionRatio === null ? 0 : idleMotionRatio * 2.5 + 0.01);
+  const tracker = new SpinTracker(baseline, { ...options.tracker, motionThreshold });
   const keyFrames: KeyFrame[] = [
     { phase: 'armed', reason: 'before spin', atMs: 0, frame: previous, diff: null, motionRatio: null, hud: null },
   ];
@@ -134,5 +151,5 @@ export async function watchSpin(options: SpinWatchOptions): Promise<SpinWatchRes
     }
   }
 
-  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses };
+  return { outcome: tracker.outcome, keyFrames, framesObserved, timedOut, bonusPresses, idleMotionRatio, motionThreshold };
 }
