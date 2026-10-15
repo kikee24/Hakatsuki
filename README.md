@@ -2,136 +2,227 @@
 
 Malackathon 2026 · Betsson Group challenge.
 
-Visual end-to-end checks for Pragmatic Play games inside the Betsson casino. The game runs in a
-cross-origin iframe rendered on a canvas, so the checker validates **what the player sees**:
-OCR on the game HUD, motion detection on the reels and template matching on controls, instead of
-relying on the game's DOM.
+End-to-end validation of a **Pragmatic Play** slot in **Real Play** inside the Betsson casino,
+done **the way a player does it**: the game is a canvas inside a cross-origin iframe, so every
+in-game fact comes from what is on screen (OCR of the HUD, motion of the reels, template matching
+of the buttons), never from the game's DOM. "A click on Spin proves nothing."
 
-## Scenarios × markets
+> **Single market: betsson.es, as instructed by the organizer (15 Oct).**
+> *Mercado único betsson.es por indicación del organizador (15/10).* The configs for betsson.com and
+> betsson.pe are kept only to show per-market configuration; they are not run.
 
-| Scenario | betsson.es (ES · EUR) | betsson.com (EN · EUR) | betsson.pe (ES · PEN) |
-|---|---|---|---|
-| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | written (`tests/e2e/spin-completed.spec.ts`), not yet run live | config ready | config ready |
-| 2. Insufficient balance — localized message, balances unchanged | written (`tests/e2e/insufficient-balance.spec.ts`), not yet run live | config ready | config ready |
+---
 
-Every requirement is a numbered check (`S1-01`…`S1-11`, `S2-01`…`S2-08`) reported as its own
-step with the values that were compared, using soft assertions so one failure does not hide the rest.
+## Notes for the grader — how to run it
 
-The test accounts we were given are on **betsson.es**, so it is the default market. The other
-markets are kept as configuration and can be enabled with `MARKETS=betsson-es,betsson-pe`.
+Everything below is done once, in this order. Total time: about 10 minutes, most of it waiting.
 
-## How the checker sees the game
+### 0. What you need
 
-The game is a canvas inside a cross-origin iframe, so every in-game fact comes from screenshots
-of that iframe:
+- **Windows 10/11** with **Google Chrome or Microsoft Edge** installed (Edge ships with Windows).
+- **Node.js 20 or newer** (`node --version`).
+- An internet connection **from Spain** (betsson.es is geo-restricted).
+- The two **test accounts** of the challenge: one *with balance* and one *without balance*.
+  Their credentials are **not** in this repository and are never typed by the code (see decision 2).
+- Nobody else using those two accounts while you run the tests (Betsson allows one session per
+  account: a login elsewhere logs us out).
 
-| Question | How it is answered | Code |
-|---|---|---|
-| What are the credit, bet and win? | OCR (Tesseract) on HUD regions, reading the amount right after each label (`CRÉDITO`, `APUESTA`, `GANANCIA`) | `src/game/hud.ts`, `src/vision/ocr.ts` |
-| Did the spin start? | At least one of: status line says `¡BUENA SUERTE!`, credit dropped by exactly the bet, reels moved in two consecutive frames | `src/game/spin-tracker.ts` |
-| Did it finish? | Status line shows a win, or reels still for 2 frames after having moved | `src/game/spin-tracker.ts` |
-| Is the result final? | Credit identical in 2 consecutive reads (win count-up done) | `src/game/spin-tracker.ts` |
-| Did the reels move? | Pixel diff of the reel area between frames (> 2% changed) | `src/vision/motion.ts` |
-| Insufficient funds? | OCR of the pop-up, fuzzy-matched against the market's localized keywords | `src/game/hud-reader.ts` |
-
-Thresholds were measured on real screenshots (`tests/fixtures/screens`): compression noise gives
-0% reel change, one reel still spinning ~6%, a new set of symbols 55-67%.
-
-## Project layout
-
-```
-config/markets/     one JSON per market (URL, language, currency, localized keywords)
-config/games/       calibrated screen regions per game
-assets/templates/   reference crops for template matching
-src/config/         config loading and validation
-src/session/        hand-logged-in browser windows per account (see Login)
-src/domain/         money parsing, balance rule, fuzzy text matching (pure, unit-tested)
-src/pages/          Betsson page objects (DOM)
-src/game/           Pragmatic game screen object (canvas, vision only)
-src/vision/         OCR, preprocessing, motion and template detection
-src/evidence/       attachments and masking of personal data
-src/reporting/      pass/fail matrix per scenario, market and check
-tests/unit/         fast tests without a browser
-tests/e2e/          scenarios, run once per market project
-tests/setup/        opens each account window and waits for a manual login if needed
-```
-
-## Setup
+### 1. Install
 
 ```bash
 npm ci
-npx playwright install ffmpeg   # videos; on Windows the installed Chrome/Edge is used
-cp .env.example .env              # optional settings, no credentials
-npm run session:funded            # first time only: log in by hand in the window that opens
-npm run session:empty             # same for the account without balance
+npx playwright install ffmpeg
 ```
 
-## Login: one hand-logged-in window per account
+`ffmpeg` is only used to record the videos shown in the dashboard. No browser download is needed:
+the installed Chrome/Edge is used.
 
-Betsson's bot protection (AWS WAF + Group-IB) silently rejects logins typed by an automated
-browser, and the session it grants cannot be copied to another browser (it lives in localStorage,
-in session-only cookies and is tied to the device). So **there are no credentials in the code,
-`.env` or CI**:
-
-- Each account has its own Chrome/Edge window with a persistent profile in `.auth/` (git-ignored,
-  never upload it). The window is a normal browser, without automation flags.
-- The first time, `npm run session:funded` / `session:empty` opens it on the login page and waits
-  for a person to log in (tick *Recordar*). After that Betsson logs the profile back in by itself.
-- Tests attach to that window over CDP (ports 9301/9302) and work in a new tab: when a test sets
-  `account`, the `page` fixture is that tab. A closed window is reopened automatically; a manual
-  login is only requested again if Betsson forgets it.
-- Only **one account window is open at a time**: with both accounts logged in from the same
-  device, Betsson logs one out. Betsson also allows one session per account, so do not run the
-  scenarios from two machines at once with the same accounts.
-
-## Games: adding one and auto-calibration
-
-Run the scenarios on a game with `npm run test:slot -- <game-id>` (default `wolf-gold`; extra
-Playwright arguments go after it). A new Pragmatic Play game only needs
-`config/games/<game-id>.json` with `id`, `name`, `provider` and `path` (its Betsson URL): regions and
-captions it does not list come from `config/games/_pragmatic-defaults.json`.
-
-When the game opens, `GamePage` finds the controls on screen like a player
-(`src/game/calibration.ts`): the round "circular arrows" button by template matching
-(`assets/templates/pragmatic-spin-icon.png`; continue on the intro, spin in the game), the CRÉDITO /
-APUESTA labels by OCR, and from them the money block, status line and "−" bet button. The found
-regions are only used if the HUD then reads the same as with the configured ones (or, for a new
-game, if it reads at all); the frame with the regions drawn is attached as *Auto-calibration*.
-The intro continue button is only pressed when the icon scores ≥ 0.85, a level the in-game spin
-button never reaches, so the spin button is never taken for it. Reels, message and bonus areas
-still come from the config.
-
-## Game session (DGOJ)
-
-In Spain a regulated *sesión de juego* with time and loss limits must be opened before Real Play
-(Orden HAP/1370/2014, art. 14). `GamePage.open()` passes it whenever it shows up
-(`src/pages/game-session-gate.ts`): the "El juego no se inicia" screen, the "Hace menos de 60 mins…"
-notice and the limits form, set from `gameSession` in the market config (15 min, 2,00 €). With no
-balance the form has no loss limit field and only the time is set. The optional self-exclusion
-(irreversible) is never touched and is checked to be on *Sin exclusión* before submitting. What
-the form showed is attached to the report as *Game session (DGOJ)*.
-
-## Running
+### 2. Log in to each account by hand — one at a time
 
 ```bash
-npm run test:unit      # domain logic and OCR on fixtures, no browser
-npm run test:es        # run both scenarios on betsson.es in the hand-logged-in windows
-npm run report         # open the results dashboard of the last run
+npm run session:funded
 ```
 
-`npm run export:results` copies the last run (scenario and unit results, check matrix and every
-attachment as a file, traces left out) to `results-export/<timestamp>/`, to share it or build a
-dashboard on it: see [docs/panel-de-control.md](docs/panel-de-control.md). Unit-only runs write their
-own report (`playwright-report-unit/`, `npm run report:unit`) and never replace a scenario run's.
+A normal Chrome/Edge window opens on the Betsson login page and the console prints
+`>>> La sesión FUNDED no está iniciada. Inicia sesión A MANO…` ("not logged in, log in by hand").
+**Log in yourself with the account WITH balance**, keep **"Recordar"** ticked, and wait for
+`>>> Sesión FUNDED lista.` ("session ready"; you have 10 minutes). If the window is already logged
+in, it goes straight to "lista". Then:
 
-### Results dashboard
+```bash
+npm run session:empty
+```
+
+Same with the account **WITHOUT balance**. The first window is closed automatically: only one account
+window may be open at a time (decision 3).
+
+This is needed only the first time on a machine. Each account keeps its own browser profile in
+`.auth/` (git-ignored), and Betsson's "Recordar" logs it back in when the window is reopened.
+
+### 3. Run the tests
+
+```bash
+npm test
+```
+
+This runs, in one go:
+
+1. **Unit and vision tests** (~1 min): money parsing, balance rules, OCR on real screenshots of the
+   games, spin state machine, auto-calibration, dashboard model. No browser, no account.
+2. **Scenario 2 — insufficient balance** with the account without balance.
+3. **Lobby smoke test** (anonymous).
+4. **Scenario 1 — completed Real Play spin** with the funded account.
+   ⚠️ **This places one real bet at the minimum stake** (0,25 € on Wolf Gold).
+
+Each scenario opens its account's window by itself (closing the other one), opens Wolf Gold, passes
+the regulated game-session screens, and plays like a player. Expect ~4–6 minutes for the scenarios.
+**Please do not close the browser windows or stop the run**: if something waits too long, the
+watchers give up on their own (at most 90 s per spin) and the report is still written.
+
+### 4. Open the results dashboard
+
+```bash
+npm run report
+```
+
+It opens `dashboard/index.html`: every check of both scenarios as PASS / FAIL with what it verifies,
+the values it compared (e.g. `98,55 € − 0,25 € + 0,05 € = 98,35 €; seen 98,35 €`) and the
+screenshots, key frames and video that back it, plus all the unit tests. See
+[Results dashboard](#results-dashboard).
+
+No account at hand? `npm run report -- docs/panel-sample` opens a reviewed real run (15 Oct, 19/19
+checks passed) committed to the repository.
+
+### If something goes wrong
+
+| Symptom | Cause and fix |
+|---|---|
+| The console asks to log in again during a run | Betsson forgot the session (or someone else logged in with the account). Log in in the window that opened; the run waits 2 min. Or stop, run `npm run session:funded` / `session:empty`, and start again. |
+| The game shows *"El juego no se inicia"* or a limits form | Expected: that is the regulated game session (decision 4). The test fills it in by itself. |
+| `Neither Chrome nor Edge found` | Set `BROWSER_EXECUTABLE` in `.env` (copy `.env.example`) to a Chromium-based browser. |
+| Scenario 1 fails with *"bet went up"* | A safety stop: the "−" press raised the bet, so it refused to spin. |
+| A run shows "not run" for one scenario | That scenario was not part of the run (e.g. a single spec was launched). |
+
+---
+
+## What is validated
+
+| Scenario | Account | Checks |
+|---|---|---|
+| **1. Completed Real Play spin** (`tests/e2e/spin-completed.spec.ts`) | with balance | S1-01 Betsson balance in EUR · S1-02 Real Play · S1-03 provider is Pragmatic Play · S1-04 in-game credit and wager in EUR · S1-05 in-game credit = Betsson balance · S1-06 spin visibly started (≥ 2 independent signals) · S1-07 displayed wager = amount charged · S1-08 spin finished and settled on screen · S1-09 in-game credit after = before − wager + payout · S1-10 Betsson balance after = before − wager + payout · S1-11 Betsson balance after = in-game credit after |
+| **2. Insufficient balance** (`tests/e2e/insufficient-balance.spec.ts`) | without balance | S2-01 Betsson balance in EUR · S2-02 Real Play with Pragmatic Play · S2-03 credit and wager in EUR · S2-04 spin rejected (no wager taken, no spin shown) · S2-05 insufficient-balance message shown · S2-06 message in Spanish · S2-07 in-game credit unchanged · S2-08 Betsson balance unchanged |
+
+Every check is its own report step with the values compared, using soft assertions so one failure
+never hides the others. A check that could not run is shown as "not run", never silently dropped.
+
+---
+
+## Critical design decisions
+
+1. **Only betsson.es.** The organizer replaced betsson.com and betsson.pe with betsson.es on 15 Oct.
+   Everything market-specific (URL, language, currency and number format, keywords, regulated
+   limits) still lives in `config/markets/<market>.json`, and the CI workflow runs one job per
+   market, so a market is one config file.
+
+2. **No automated login, no credentials anywhere.** Betsson's bot protection (AWS WAF + Group-IB)
+   silently rejects a login typed by an automated browser, and the session it grants cannot be
+   copied to another browser (it lives in localStorage and session-only cookies, tied to the
+   device). The organizer's advice was to reuse a hand-made session. So a person logs in once per
+   account in a normal browser window (no automation flags) and the tests **attach to that window
+   over CDP** (ports 9301 / 9302) and work in a new tab (`src/session/`). There are no credentials in
+   the code, `.env`, CI secrets or reports.
+
+3. **One account window at a time.** With both accounts logged in from the same device, Betsson logs
+   one of them out. Before using an account, the other account's window is closed; it is reopened
+   (and logged back in by "Recordar") when needed.
+
+4. **The regulated game session (DGOJ) is passed like a player would.** In Spain a *sesión de juego*
+   with time and loss limits must be opened before Real Play (Orden HAP/1370/2014, art. 14). The
+   test fills the limits form with small limits from the market config (15 min, 2,00 €; time only
+   when there is no balance) and **never touches the irreversible self-exclusion option**, which is
+   checked to be on *Sin exclusión* before submitting (`src/pages/game-session-gate.ts`).
+
+5. **Vision only inside the game; DOM only for Betsson's own pages.** In-game values come from OCR
+   (Tesseract) of the HUD (CRÉDITO, APUESTA, GANANCIA, status line), reel motion from pixel diffs, and
+   buttons from template matching. Betsson's balance comes from its own page (DOM), which is exactly
+   what the rule has to be cross-checked against. Network traffic is never used to decide pass/fail.
+
+6. **"Started" and "finished" need on-screen evidence, not a click.** A spin *started* when at least
+   two of these are seen: the credit dropped by exactly the wager, "¡BUENA SUERTE!", reels moving in
+   consecutive frames. It *finished* when the status line shows a win or goes back to "¡HAGA SU
+   APUESTA!" (or the reels stay still), and *settled* when the credit stops changing — confirmed once
+   more 4 s later, because a bonus screen or a cascading win can still change the result. The game's
+   previous win left on screen is not taken for this spin's. Free-spin bonuses are played through
+   by pressing their "pulse en cualquier parte" screens (`src/game/spin-tracker.ts`,
+   `src/game/spin-watcher.ts`).
+
+7. **Controls are found on screen (auto-calibration), with safety thresholds.** When the game opens,
+   the round "circular arrows" button of Pragmatic Play is found by template matching (continue on
+   the intro, spin in the game) and the CRÉDITO / APUESTA labels by OCR; from them the money block,
+   status line and "−" bet button follow (`src/game/calibration.ts`). The found regions are used only
+   if the HUD then reads the same as with the configured ones. The intro "continue" is only pressed
+   at a match score ≥ 0.85, which the in-game spin button never reaches, so the test can never spin
+   by mistake. Lowering the bet stops before any spin if a press ever raises it.
+
+8. **Money is exact.** Amounts are integer cents, parsed in the market format (`1.234,56 €`). An
+   amount without two decimals is treated as an OCR misread (the game always shows them) and read
+   again, so "0,15 €" can never become 15 €.
+
+9. **Evidence without personal data.** The dashboard shows screenshots, key frames, OCR inputs and
+   the video of the real tab; recording pauses while Betsson's balance menu (which shows the
+   player's name) is open, and balance screenshots are cropped to the amount row. Traces of the
+   real tab contain the session's cookies, so they are kept local only and never exported or
+   published.
+
+10. **Retries only for infrastructure, never for assertions.** Navigation and loading wait and retry;
+    a check is evaluated once and reported as it is.
+
+---
+
+## How the checker sees the game
+
+| Question | How it is answered | Code |
+|---|---|---|
+| Credit, bet and win? | OCR of the HUD regions, reading the amount right after each label; several image variants until one reads a valid amount | `src/game/hud.ts`, `src/vision/ocr.ts` |
+| Where are the controls? | Template match of the round button + OCR of the labels, checked against a HUD reading | `src/game/calibration.ts`, `src/vision/icon-finder.ts` |
+| Did the spin start? | ≥ 2 of: credit dropped by exactly the bet, "¡BUENA SUERTE!", reels moving | `src/game/spin-tracker.ts` |
+| Did it finish? | Status line shows a new win, or is back to "¡HAGA SU APUESTA!" after the start, or reels still | `src/game/spin-tracker.ts` |
+| Is the result final? | Credit identical in consecutive reads, no bonus running, and unchanged 4 s later | `src/game/spin-watcher.ts` |
+| Did the reels move? | Pixel diff of the reel area; "still" is judged against the motion measured at rest (some games animate their symbols all the time) | `src/vision/motion.ts` |
+| Bonus round? | "TIRADAS GRATIS RESTANTES" on the status line; "PULSE EN CUALQUIER PARTE…" screens are pressed | `src/game/hud.ts` |
+| Insufficient funds? | OCR of the pop-up, fuzzy-matched against the market's keywords (and not another language's) | `src/game/hud-reader.ts` |
+
+Thresholds were measured on real screenshots (`tests/fixtures/screens/`, including frames of a real
+free-spins bonus and of Bubble Up).
+
+---
+
+## Games
+
+Wolf Gold (classic 5×3 line slot, no cascades) is the default and the one validated end to end.
+Run the scenarios on another configured game with:
+
+```bash
+npm run test:slot -- bubble-up
+```
+
+(Extra Playwright arguments go after the game id, e.g. `npm run test:slot -- bubble-up tests/e2e/insufficient-balance.spec.ts`.)
+
+A new Pragmatic Play game only needs `config/games/<game-id>.json` with `id`, `name`, `provider`
+and `path` (its Betsson URL). Regions and captions it does not list come from
+`config/games/_pragmatic-defaults.json`, and auto-calibration (decision 7) finds the controls on
+screen. The frame with the regions drawn is attached to the report as *Auto-calibration*.
+
+---
+
+## Results dashboard
 
 When a run ends, `dashboard/index.html` is written (`npm run report` opens it). For each scenario
 and market it lists every check (`S1-01`…`S2-08`) as PASS / FAIL / not run, what it verifies and how,
-and the values it saw (e.g. `98,55 € − 0,25 € + 0,05 € = 98,35 €; seen 98,35 €`), with the
-screenshots that back it. Each test also shows its video, its key frames per spin phase (playable in
-order), the full screenshot gallery (Betsson balance, HUD and OCR crops, pop-up), the OCR text and
-JSON it read, and its steps. The unit tests are listed by file at the end.
+and the values it saw, with the screenshots that back it. Each test also shows its video, its key
+frames per spin phase (playable in order), the full screenshot gallery (Betsson balance, HUD and OCR
+crops, pop-up, auto-calibration), the OCR text and JSON it read, and its steps. The unit tests are
+listed by file at the end.
 
 - The hand-logged-in tab is recorded with Playwright's screencast (needs `npx playwright install ffmpeg`;
   `RECORD_LIVE=0` turns it off). Recording pauses while the Betsson balance menu is open, because it
@@ -143,6 +234,45 @@ JSON it read, and its steps. The unit tests are listed by file at the end.
 
 `check-matrix/index.html` still holds the bare check × market matrix, and `npm run report:playwright`
 the full Playwright report.
+
+---
+
+## Other commands
+
+| Command | What it does |
+|---|---|
+| `npm run test:unit` | Unit and vision tests only (own report in `playwright-report-unit/`, never replaces a scenario run's) |
+| `npm run test:es` | Both scenarios and the lobby smoke test on betsson.es |
+| `npm run test:slot -- <game>` | The same on another game |
+| `npm run export:results` | Copies the last run (results, check matrix, every attachment as a file; traces left out) to `results-export/<timestamp>/` to share it |
+| `npm run report:playwright` | Playwright's own HTML report, with traces |
+| `npm run recon -- funded 60` | Opens the game in the logged-in window and records screenshots for 60 s without clicking in the game |
+| `npm run typecheck` | TypeScript check |
+
+---
+
+## Project layout
+
+```
+config/markets/       one JSON per market (URL, language, currency, keywords, game-session limits)
+config/games/         one JSON per game; _pragmatic-defaults.json for what a game does not list
+assets/templates/     reference crops for template matching (Pragmatic's round button)
+src/config/           config loading and validation
+src/session/          hand-logged-in browser windows per account (decision 2)
+src/pages/            Betsson page objects (DOM): balance menu, game page, game-session gate
+src/game/             the game seen from outside: HUD reading, calibration, spin tracker and watcher
+src/vision/           OCR, preprocessing, motion and template matching
+src/domain/           money parsing, balance rules, fuzzy text matching (pure, unit-tested)
+src/evidence/         report attachments, live tab recorder
+src/reporting/        check catalog, check matrix and results dashboard
+tests/unit/           fast tests without a browser (real screenshots in tests/fixtures/screens/)
+tests/e2e/            the scenarios
+tests/setup/          opens each account window and waits for a manual login if needed
+tools/                dashboard, test-slot, export, recon
+docs/                 dashboard guide, recon notes, reviewed sample run
+```
+
+---
 
 ## GitHub Actions
 
@@ -163,11 +293,10 @@ Actions* (Pages on a private repository needs a paid plan). The same site is kep
 `game-validation-report`: `index.html` is the dashboard, `check-matrix/` the matrix and
 `playwright-report/` the full Playwright report.
 
-### Repository secrets (*Settings → Secrets and variables → Actions → Secrets*)
+**Secrets** (*Settings → Secrets and variables → Actions*): no account credentials. Optionally
+`BETSSON_ES_PROXY_SERVER`.
 
-No account credentials. Optionally `BETSSON_ES_PROXY_SERVER` (same with `COM` / `PE`).
-
-### Repository variables (optional, same page → *Variables*)
+**Variables** (same page → *Variables*, optional):
 
 | Variable | Effect |
 |---|---|
@@ -178,3 +307,13 @@ No account credentials. Optionally `BETSSON_ES_PROXY_SERVER` (same with `COM` / 
 A self-hosted runner is registered from *Settings → Actions → Runners → New self-hosted runner*.
 Run it interactively (`run.cmd`, not as a Windows service) so it can reach the browser windows,
 and open them once with `npm run session:funded` / `session:empty` before the first run.
+
+---
+
+## Known limitations
+
+- Pragmatic Play games only: auto-calibration relies on their standard round button and HUD labels.
+- Bubble Up (a 6×5 grid game) is supported but less proven than Wolf Gold: its large gold
+  "GANANCIA" is sometimes misread by OCR.
+- The reels, message and bonus-click areas still come from the game config.
+- A login is needed by hand once per account and machine, and again whenever Betsson forgets it.
