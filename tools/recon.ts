@@ -18,7 +18,8 @@ import { CookieBanner } from '../src/pages/cookie-banner';
 import { ensureLoggedIn } from '../src/session/ensure-session';
 import { connectLiveBrowser } from '../src/session/live-browser';
 
-const GAME_PATH = loadGame('wolf-gold').path;
+const GAME_ID = process.env.GAME_ID?.trim() || 'wolf-gold';
+const GAME_PATH = loadGame(GAME_ID).path;
 const SAFE_PARAMS = ['lang', 'language', 'currency', 'cur', 'gameSymbol', 'symbol', 'gameId', 'forReal', 'marketCode', 'provider'];
 
 const kind = (process.argv[2]?.toUpperCase() ?? 'FUNDED') as AccountKind;
@@ -42,7 +43,7 @@ function safeUrl(raw: string): string {
 }
 
 async function main() {
-  say(`Account: ${kind}. Recording for ${seconds}s into ${outDir}`);
+  say(`Game: ${GAME_ID}. Account: ${kind}. Recording for ${seconds}s into ${outDir}`);
   await ensureLoggedIn(market, kind);
   const browser = await connectLiveBrowser(kind);
   const page = await browser.contexts()[0]!.newPage();
