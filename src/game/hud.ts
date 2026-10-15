@@ -1,0 +1,48 @@
+import type { GameTexts } from '../config/game';
+import { parseMoney, type Money } from '../domain/money';
+import { fuzzyContains, levenshtein, normalizeText, stripAccents } from '../domain/text-match';
+
+/** What the game says it is doing, read from the status line under the reels. */
+export type SpinStatus = 'idle' | 'spinning' | 'win' | 'unknown';
+
+export interface HudReading {
+  credit: Money | null;
+  bet: Money | null;
+  /** Amount shown after a winning spin; null when the status line shows no win. */
+  win: Money | null;
+  status: SpinStatus;
+}
+
+function isLabel(word: string, labels: readonly string[]): boolean {
+  const clean = normalizeText(word).replace(/ /g, '');
+  // One OCR error allowed per 5 letters: "credit0" still matches "credito".
+  return clean.length >= 3 && labels.some((l) => levenshtein(clean, l) <= Math.floor(l.length / 5));
+}
+
+/**
+ * Finds a label such as "CRÉDITO" in OCR text and parses the amount right after it on the same line.
+ * Reading after the label (not the first number on the line) ignores stray characters like "7 APUESTA".
+ */
+export function amountAfterLabel(text: string, labels: readonly string[]): Money | null {
+  for (const rawLine of text.split('\n')) {
+    const line = stripAccents(rawLine);
+    for (const word of line.matchAll(/\S+/g)) {
+      if (!isLabel(word[0], labels)) continue;
+      const money = parseMoney(line.slice(word.index + word[0].length));
+      if (money) return money;
+    }
+  }
+  return null;
+}
+
+export function readMoneyBlock(text: string, texts: GameTexts): Pick<HudReading, 'credit' | 'bet'> {
+  return { credit: amountAfterLabel(text, texts.credit), bet: amountAfterLabel(text, texts.bet) };
+}
+
+export function readStatusLine(text: string, texts: GameTexts): Pick<HudReading, 'status' | 'win'> {
+  const win = amountAfterLabel(text, texts.win);
+  if (win) return { status: 'win', win };
+  if (texts.spinning.some((p) => fuzzyContains(text, p))) return { status: 'spinning', win: null };
+  if (texts.idle.some((p) => fuzzyContains(text, p))) return { status: 'idle', win: null };
+  return { status: 'unknown', win: null };
+}

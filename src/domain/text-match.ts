@@ -1,14 +1,17 @@
+/** Removes accents but keeps every other character (punctuation, digits, currency symbols). */
+export function stripAccents(text: string): string {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
 /** Lowercase, strip accents and collapse anything that is not a letter or digit. */
 export function normalizeText(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+  return stripAccents(text)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 }
 
-function levenshtein(a: string, b: string): number {
+export function levenshtein(a: string, b: string): number {
   const row = Array.from({ length: b.length + 1 }, (_, i) => i);
   for (let i = 1; i <= a.length; i++) {
     let diagonal = row[0]!;
