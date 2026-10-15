@@ -1,0 +1,32 @@
+{
+  "name": "hakatsuki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Intelligent Game Validation - visual E2E checks for Pragmatic Play games on Betsson (Malackathon 2026)",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:unit": "playwright test --project=unit",
+    "test:com": "playwright test --project=betsson-com",
+    "test:pe": "playwright test --project=betsson-pe",
+    "report": "playwright show-report"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@types/pngjs": "^6.0.5",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "sharp": "^0.35.5",
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.6.7"
+  }
+}

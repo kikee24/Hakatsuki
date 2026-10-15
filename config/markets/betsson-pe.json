@@ -1,0 +1,18 @@
+{
+  "id": "betsson-pe",
+  "name": "betsson.pe",
+  "baseUrl": "https://www.betsson.pe",
+  "lobbyPath": "/casino",
+  "locale": "es-PE",
+  "language": "es",
+  "ocrLanguage": "spa",
+  "currency": "PEN",
+  "envPrefix": "BETSSON_PE",
+  "insufficientFundsKeywords": [
+    "saldo insuficiente",
+    "fondos insuficientes",
+    "no tienes suficiente saldo",
+    "no tiene suficiente saldo",
+    "no hay suficientes fondos"
+  ]
+}
