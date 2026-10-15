@@ -1,0 +1,7 @@
+money [threshold]:
+N CRÉDITO 99.998,00 €
+7 APUESTA 2,00 €
+
+status [threshold]:
+. , » — a y
+¡BUENA SUERTE!

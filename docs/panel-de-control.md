@@ -17,7 +17,14 @@ npm ci
 
 ## 2. Conseguir datos de una ejecución
 
-Los resultados **no están en git** (`.gitignore`): se generan en cada ejecución. Tres formas:
+**Ya hay una ejecución real en el repo para empezar: [`docs/panel-sample/`](panel-sample/)**
+(15/10, 16:35, betsson.es): los dos escenarios **en verde, 19/19 checks**, el smoke del lobby y los
+66 tests unitarios, con todas sus capturas en `files/`. Revisada a mano: sin credenciales, sin nombre
+del jugador, sin cookies ni trazas. Con esto se puede hacer el panel entero sin cuenta ni Betsson;
+`npm run panel` puede usarla por defecto cuando no haya ninguna carpeta en `results-export/`.
+
+Para ejecuciones nuevas, los resultados **no están en git** (`.gitignore`): se generan en cada
+ejecución. Tres formas:
 
 | Forma | Cuándo | Cómo |
 |---|---|---|

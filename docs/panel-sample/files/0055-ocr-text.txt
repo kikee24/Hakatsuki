@@ -1,0 +1,7 @@
+money [threshold]:
+N CRÉDITO 99.992,40 €
+7 APUESTA 2,00 € (
+
+status [threshold]:
+GANANCIA 0,40 €
+AQ: LA LÍNEA 12 ABONA 0,40 €

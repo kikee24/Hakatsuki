@@ -45,6 +45,9 @@ const requestedProjects = process.argv.flatMap((arg, i, all) =>
   arg.startsWith('--project=') ? [arg.slice('--project='.length)] : arg === '--project' && all[i + 1] ? [all[i + 1]!] : [],
 );
 const unitOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p === 'unit');
+// npm run session:funded / session:empty only (re)open a logged-in window: console output only, so
+// they never replace the last scenario run's report either.
+const sessionOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p.endsWith('-session'));
 
 export default defineConfig<MarketOptions>({
   timeout: 180_000,
@@ -53,7 +56,9 @@ export default defineConfig<MarketOptions>({
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,
-  reporter: unitOnly
+  reporter: sessionOnly
+    ? [['list']]
+    : unitOnly
     ? [
         ['list'],
         ['html', { open: 'never', outputFolder: 'playwright-report-unit' }],

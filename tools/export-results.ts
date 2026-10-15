@@ -75,6 +75,20 @@ function rewrite(node: unknown): unknown {
   return node;
 }
 
+/**
+ * Nothing about the machine that ran the tests: the report's `config` section (absolute paths,
+ * options) is dropped and the repository path in error stacks or messages becomes "." .
+ */
+function sanitize(report: Record<string, unknown>): string {
+  const { config: _machineConfig, ...rest } = report;
+  let json = JSON.stringify(rest, null, 2);
+  const root = process.cwd();
+  for (const form of [root, root.replace(/\\/g, '/')]) {
+    json = json.split(JSON.stringify(form).slice(1, -1)).join('.');
+  }
+  return json.replace(/C:\\\\Users\\\\[^\\\\"]+/gi, 'C:\\\\Users\\\\<user>').replace(/C:\/Users\/[^/"]+/gi, 'C:/Users/<user>');
+}
+
 const sources: [string, string][] = [
   ['test-results/results.json', 'scenarios.json'],
   ['test-results-unit/results.json', 'unit.json'],
@@ -82,7 +96,7 @@ const sources: [string, string][] = [
 const written: string[] = [];
 for (const [src, dst] of sources) {
   if (!existsSync(src)) continue;
-  writeFileSync(join(outDir, dst), JSON.stringify(rewrite(JSON.parse(readFileSync(src, 'utf8'))), null, 2));
+  writeFileSync(join(outDir, dst), sanitize(rewrite(JSON.parse(readFileSync(src, 'utf8'))) as Record<string, unknown>));
   written.push(dst);
 }
 if (existsSync('check-matrix/check-matrix.json')) {
