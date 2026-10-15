@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unit-report
-          path: playwright-report/
+          path: playwright-report-unit/
           retention-days: 14
 
   scenarios:

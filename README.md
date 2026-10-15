@@ -102,6 +102,11 @@ npm run test:es        # run both scenarios on betsson.es in the hand-logged-in 
 npm run report         # open the Playwright HTML report
 ```
 
+`npm run export:results` copies the last run (scenario and unit results, check matrix and every
+attachment as a file, traces left out) to `results-export/<timestamp>/`, to share it or build a
+dashboard on it: see [docs/panel-de-control.md](docs/panel-de-control.md). Unit-only runs write their
+own report (`playwright-report-unit/`, `npm run report:unit`) and never replace a scenario run's.
+
 After a scenario run, `check-matrix/index.html` shows every check (rows) per market (columns) as
 pass / fail / not run, with the compared values. The Playwright report holds the evidence: game
 frames per spin phase, reel-motion diffs, the exact OCR inputs and text, traces and videos.

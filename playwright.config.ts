@@ -39,6 +39,13 @@ const marketProjects: Project<MarketOptions>[] = activeMarkets().flatMap((id) =>
   ];
 });
 
+// A run of the unit tests alone (npm run test:unit) writes its own reports, so it never replaces
+// the report, results.json or check matrix of a scenario run.
+const requestedProjects = process.argv.flatMap((arg, i, all) =>
+  arg.startsWith('--project=') ? [arg.slice('--project='.length)] : arg === '--project' && all[i + 1] ? [all[i + 1]!] : [],
+);
+const unitOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p === 'unit');
+
 export default defineConfig<MarketOptions>({
   timeout: 180_000,
   expect: { timeout: 15_000 },
@@ -46,14 +53,20 @@ export default defineConfig<MarketOptions>({
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['./src/reporting/check-matrix-reporter.ts', { outputDir: 'check-matrix', reportLink: '../playwright-report/index.html' }],
-    // In CI each market job also writes a blob; the report job merges them (see merge.config.ts).
-    ...(process.env.CI ? [['blob'] as ['blob']] : []),
-  ],
+  reporter: unitOnly
+    ? [
+        ['list'],
+        ['html', { open: 'never', outputFolder: 'playwright-report-unit' }],
+        ['json', { outputFile: 'test-results-unit/results.json' }],
+      ]
+    : [
+        ['list'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+        ['./src/reporting/check-matrix-reporter.ts', { outputDir: 'check-matrix', reportLink: '../playwright-report/index.html' }],
+        // In CI each market job also writes a blob; the report job merges them (see merge.config.ts).
+        ...(process.env.CI ? [['blob'] as ['blob']] : []),
+      ],
   use: {
     trace: 'on',
     video: 'on',

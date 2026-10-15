@@ -12,6 +12,8 @@
     "session:funded": "playwright test --project=betsson-es-session -g funded",
     "session:empty": "playwright test --project=betsson-es-session -g empty",
     "report": "playwright show-report",
+    "report:unit": "playwright show-report playwright-report-unit",
+    "export:results": "tsx tools/export-results.ts",
     "recon": "tsx tools/recon.ts"
   },
   "engines": {
