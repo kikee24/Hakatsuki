@@ -21,6 +21,7 @@
       "idle": ["haga su apuesta"],
       "spinning": ["buena suerte"],
       "dismiss": ["aceptar"],
+      "linePays": ["abona"],
       "bonusActive": ["tiradas gratis restantes", "respins restantes"],
       "pressToContinue": ["pulse en cualquier parte", "para continuar"]
     },
@@ -31,6 +32,7 @@
       "idle": ["place your bets"],
       "spinning": ["good luck"],
       "dismiss": ["ok"],
+      "linePays": ["pays"],
       "bonusActive": ["free spins left", "respins left"],
       "pressToContinue": ["press anywhere", "to continue"]
     }

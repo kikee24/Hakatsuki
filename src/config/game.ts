@@ -18,6 +18,8 @@ const GameTextsSchema = z.object({
   spinning: z.array(z.string()).min(1),
   /** Caption of the button that closes an in-game message. */
   dismiss: z.array(z.string()).min(1),
+  /** Per-line detail under a win ("LA LÍNEA 12 ABONA 0,40 €"). */
+  linePays: z.array(z.string()).min(1),
   /** Status line while a bonus round is still running ("TIRADAS GRATIS RESTANTES 2"). */
   bonusActive: z.array(z.string()).min(1),
   /** Full-screen bonus prompt waiting for the player ("PULSE EN CUALQUIER PARTE PARA CONTINUAR"). */

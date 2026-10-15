@@ -58,6 +58,11 @@ export interface SpinOutcome {
   finalCreditCents: number | null;
   /** Win shown by the game once the reels stopped; 0 for a losing spin. */
   payoutCents: number;
+  /**
+   * The same payout computed the other way, from the credit (final − after wager), as evidence:
+   * both should agree. Null when either credit was not read.
+   */
+  payoutFromCreditCents: number | null;
   /** A bonus round was seen during this spin. */
   bonus: boolean;
   changes: PhaseChange[];
@@ -177,6 +182,8 @@ export class SpinTracker {
       creditAfterWagerCents: this.creditAfterWager,
       finalCreditCents: this.finalCredit,
       payoutCents: this.payout,
+      payoutFromCreditCents:
+        this.finalCredit !== null && this.creditAfterWager !== null ? this.finalCredit - this.creditAfterWager : null,
       bonus: this.bonusSeen,
       changes: [...this.changes],
     };

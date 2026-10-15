@@ -59,5 +59,9 @@ export default defineConfig<MarketOptions>({
     video: 'on',
     screenshot: 'on',
   },
-  projects: [{ name: 'unit', testDir: './tests/unit' }, ...marketProjects],
+  projects: [
+    // Own output folder: running the unit tests must never wipe a scenario run's test-results/.
+    { name: 'unit', testDir: './tests/unit', outputDir: 'test-results-unit' },
+    ...marketProjects,
+  ],
 });
