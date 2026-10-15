@@ -1,0 +1,18 @@
+{
+  "id": "betsson-es",
+  "name": "betsson.es",
+  "baseUrl": "https://www.betsson.es",
+  "lobbyPath": "/casino",
+  "locale": "es-ES",
+  "language": "es",
+  "ocrLanguage": "spa",
+  "currency": "EUR",
+  "envPrefix": "BETSSON_ES",
+  "insufficientFundsKeywords": [
+    "saldo insuficiente",
+    "fondos insuficientes",
+    "no tienes suficiente saldo",
+    "no tiene suficiente saldo",
+    "no hay suficientes fondos"
+  ]
+}

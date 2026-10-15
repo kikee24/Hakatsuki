@@ -8,8 +8,7 @@
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:unit": "playwright test --project=unit",
-    "test:com": "playwright test --project=betsson-com",
-    "test:pe": "playwright test --project=betsson-pe",
+    "test:es": "playwright test --project=betsson-es",
     "report": "playwright show-report"
   },
   "engines": {

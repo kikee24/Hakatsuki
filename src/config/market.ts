@@ -18,8 +18,19 @@ const MarketSchema = z.object({
 
 export type MarketConfig = z.infer<typeof MarketSchema>;
 
-export const MARKET_IDS = ['betsson-com', 'betsson-pe'] as const;
+export const MARKET_IDS = ['betsson-es', 'betsson-com', 'betsson-pe'] as const;
 export type MarketId = (typeof MARKET_IDS)[number];
+
+const DEFAULT_MARKETS: MarketId[] = ['betsson-es'];
+
+/** Markets to run, from MARKETS="betsson-es,betsson-pe". Defaults to the market we have accounts for. */
+export function activeMarkets(value = process.env.MARKETS): MarketId[] {
+  const requested = value?.split(',').map((m) => m.trim()).filter(Boolean);
+  if (!requested?.length) return DEFAULT_MARKETS;
+  const unknown = requested.filter((m) => !(MARKET_IDS as readonly string[]).includes(m));
+  if (unknown.length) throw new Error(`Unknown market(s) in MARKETS: ${unknown.join(', ')}. Known: ${MARKET_IDS.join(', ')}`);
+  return requested as MarketId[];
+}
 
 export function loadMarket(id: string): MarketConfig {
   const file = resolve(process.cwd(), 'config', 'markets', `${id}.json`);

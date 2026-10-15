@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { reconcileBalance } from '../../src/domain/balance-rule';
 import { findKeyword, fuzzyContains } from '../../src/domain/text-match';
-import { loadMarket, MARKET_IDS } from '../../src/config/market';
+import { activeMarkets, loadMarket, MARKET_IDS } from '../../src/config/market';
 
 test.describe('reconcileBalance', () => {
   test('losing spin', () => {
@@ -38,4 +38,18 @@ test.describe('fuzzy text matching', () => {
 
 test('every market config is valid', () => {
   for (const id of MARKET_IDS) expect(() => loadMarket(id)).not.toThrow();
+});
+
+test.describe('activeMarkets', () => {
+  test('defaults to betsson.es', () => {
+    expect(activeMarkets(undefined)).toEqual(['betsson-es']);
+  });
+
+  test('reads a comma-separated list', () => {
+    expect(activeMarkets('betsson-es, betsson-pe')).toEqual(['betsson-es', 'betsson-pe']);
+  });
+
+  test('rejects unknown markets', () => {
+    expect(() => activeMarkets('betsson-xx')).toThrow(/Unknown market/);
+  });
 });

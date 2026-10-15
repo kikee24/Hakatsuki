@@ -6,7 +6,7 @@ export interface MarketOptions {
 }
 
 export const test = base.extend<MarketOptions & { market: MarketConfig }>({
-  marketId: ['betsson-com', { option: true }],
+  marketId: ['betsson-es', { option: true }],
   market: async ({ marketId }, use) => {
     await use(loadMarket(marketId));
   },

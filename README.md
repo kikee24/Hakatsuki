@@ -9,10 +9,13 @@ relying on the game's DOM.
 
 ## Scenarios × markets
 
-| Scenario | betsson.com (EN · EUR) | betsson.pe (ES · PEN) |
-|---|---|---|
-| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | ✅ planned | ✅ planned |
-| 2. Insufficient balance — localized message, balances unchanged | ✅ planned | ✅ planned |
+| Scenario | betsson.es (ES · EUR) | betsson.com (EN · EUR) | betsson.pe (ES · PEN) |
+|---|---|---|---|
+| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | planned | config ready | config ready |
+| 2. Insufficient balance — localized message, balances unchanged | planned | config ready | config ready |
+
+The test accounts we were given are on **betsson.es**, so it is the default market. The other
+markets are kept as configuration and can be enabled with `MARKETS=betsson-es,betsson-pe`.
 
 ## Project layout
 
@@ -46,7 +49,6 @@ They are never committed, and login runs without tracing so they never appear in
 
 ```bash
 npm run test:unit      # domain logic, no browser
-npm run test:com       # all scenarios on betsson.com
-npm run test:pe        # all scenarios on betsson.pe
+npm run test:es        # all scenarios on betsson.es
 npm run report         # open the HTML report
 ```

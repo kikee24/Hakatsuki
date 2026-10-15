@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import { defineConfig, devices, type Project } from '@playwright/test';
 import { getProxy } from './src/config/env';
-import { loadMarket, MARKET_IDS } from './src/config/market';
+import { activeMarkets, loadMarket } from './src/config/market';
 import type { MarketOptions } from './src/fixtures';
 
-const marketProjects: Project<MarketOptions>[] = MARKET_IDS.map((id) => {
+const marketProjects: Project<MarketOptions>[] = activeMarkets().map((id) => {
   const market = loadMarket(id);
   return {
     name: id,
