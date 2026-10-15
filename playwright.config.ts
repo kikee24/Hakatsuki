@@ -48,6 +48,8 @@ const unitOnly = requestedProjects.length > 0 && requestedProjects.every((p) => 
 // npm run session:funded / session:empty only (re)open a logged-in window: console output only, so
 // they never replace the last scenario run's report either.
 const sessionOnly = requestedProjects.length > 0 && requestedProjects.every((p) => p.endsWith('-session'));
+// --list runs nothing: it must not write an empty report or check matrix over the last real run.
+const listOnly = process.argv.includes('--list');
 
 export default defineConfig<MarketOptions>({
   timeout: 180_000,
@@ -56,7 +58,7 @@ export default defineConfig<MarketOptions>({
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,
-  reporter: sessionOnly
+  reporter: sessionOnly || listOnly
     ? [['list']]
     : unitOnly
     ? [
