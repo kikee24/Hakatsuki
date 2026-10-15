@@ -4,6 +4,7 @@ import { marketUi, type MarketConfig, type MarketUi } from '../config/market';
 import { findKeyword } from '../domain/text-match';
 import type { HudReader, HudSnapshot } from '../game/hud-reader';
 import type { OcrResult } from '../vision/ocr';
+import { GameSessionGate } from './game-session-gate';
 
 export interface GameMessage {
   frame: Buffer;
@@ -11,6 +12,28 @@ export interface GameMessage {
   /** Which expected keyword was recognised, or null if none appeared before the timeout. */
   keyword: string | null;
 }
+
+/** One pass through the DGOJ game session gate (see GameSessionGate), kept as evidence. */
+export interface GameSessionPass {
+  /** False when Betsson showed no loss limit field (no balance): only the time limit was set. */
+  lossLimitSet: boolean;
+  /** What the limits form showed before submitting. */
+  shownText: string;
+}
+
+/** Betsson refused to open a game session: play was blocked by the operator, not by the game. */
+export class GameSessionRefusedError extends Error {
+  constructor(readonly formText: string) {
+    super(`Betsson did not accept the game session limits. Form says: ${formText.slice(0, 300)}`);
+    this.name = 'GameSessionRefusedError';
+  }
+}
+
+// The gate can replace the launcher iframe a moment after the iframe shows: only call the game
+// open once no gate has appeared for this long.
+const GATE_SETTLE_MS = 3_000;
+// The gate may come back (e.g. the cool-down notice, then the form); never loop on it forever.
+const MAX_GATE_PASSES = 3;
 
 export interface PlayMode {
   real: boolean;
@@ -28,6 +51,9 @@ export interface PlayMode {
  */
 export class GamePage {
   private readonly ui: MarketUi;
+  private readonly gate: GameSessionGate | undefined;
+  /** Every time the game session gate was passed while opening the game. */
+  readonly gameSessionPasses: GameSessionPass[] = [];
 
   constructor(
     private readonly page: Page,
@@ -35,6 +61,7 @@ export class GamePage {
     private readonly game: GameConfig,
   ) {
     this.ui = marketUi(market);
+    this.gate = market.gameSession ? new GameSessionGate(page, market.gameSession) : undefined;
   }
 
   /** The Betsson launcher iframe that hosts the provider game (it lives in shadow DOM). */
@@ -48,7 +75,7 @@ export class GamePage {
 
   async open(): Promise<void> {
     await this.page.goto(new URL(this.game.path, this.market.baseUrl).toString());
-    await this.frame.waitFor({ state: 'visible', timeout: 60_000 });
+    await this.waitForGameFrame();
   }
 
   /** Switches from practice to real money if Betsson opened the game in practice mode. */
@@ -56,9 +83,34 @@ export class GamePage {
     if (await this.practiceBanner.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await this.page.getByText(this.ui.realModeLink).first().click();
       await this.practiceBanner.waitFor({ state: 'hidden', timeout: 30_000 });
-      await this.frame.waitFor({ state: 'visible', timeout: 60_000 });
+      await this.waitForGameFrame();
     }
     return this.playMode();
+  }
+
+  /**
+   * Waits for the launcher iframe, passing the DGOJ game session gate (Spain) whenever it shows up:
+   * it may not, if a game session is already active. Throws GameSessionRefusedError if Betsson
+   * refuses the session.
+   */
+  private async waitForGameFrame(timeoutMs = 90_000): Promise<void> {
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+      if (this.gate && (await this.gate.isGated())) {
+        if (this.gameSessionPasses.length >= MAX_GATE_PASSES) throw new Error('The game session gate keeps coming back.');
+        const { accepted, lossLimitSet, shownText, formText } = await this.gate.tryStart();
+        if (!accepted) throw new GameSessionRefusedError(formText);
+        this.gameSessionPasses.push({ lossLimitSet, shownText });
+        continue;
+      }
+      if (await this.frame.isVisible()) {
+        await this.page.waitForTimeout(GATE_SETTLE_MS);
+        if (!(this.gate && (await this.gate.isGated())) && (await this.frame.isVisible())) return;
+        continue;
+      }
+      if (Date.now() > deadline) throw new Error(`Game frame did not show up within ${timeoutMs / 1000}s.`);
+      await this.page.waitForTimeout(1_000);
+    }
   }
 
   async playMode(): Promise<PlayMode> {

@@ -1,5 +1,6 @@
 /**
- * Reconnaissance run: logs in, opens a game and records what the player sees.
+ * Reconnaissance run: opens a game in the account's hand-logged-in window (src/session/) and
+ * records what the player sees.
  * It never clicks inside the game, so it never places a bet.
  *
  *   npx tsx tools/recon.ts [funded|empty] [seconds]
@@ -10,13 +11,12 @@
 import 'dotenv/config';
 import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { chromium, type Page } from '@playwright/test';
-import { browserChannel } from '../src/config/browser';
-import { getCredentials, type AccountKind } from '../src/config/env';
+import type { AccountKind } from '../src/config/env';
 import { loadGame } from '../src/config/game';
-import { loadMarket, marketUi } from '../src/config/market';
+import { loadMarket } from '../src/config/market';
 import { CookieBanner } from '../src/pages/cookie-banner';
-import { LoginBlockedError, LoginDialog } from '../src/pages/login-dialog';
+import { ensureLoggedIn } from '../src/session/ensure-session';
+import { connectLiveBrowser } from '../src/session/live-browser';
 
 const GAME_PATH = loadGame('wolf-gold').path;
 const SAFE_PARAMS = ['lang', 'language', 'currency', 'cur', 'gameSymbol', 'symbol', 'gameId', 'forReal', 'marketCode', 'provider'];
@@ -41,23 +41,12 @@ function safeUrl(raw: string): string {
   }
 }
 
-async function login(page: Page) {
-  const dialog = new LoginDialog(page, marketUi(market));
-  try {
-    await dialog.logIn(getCredentials(market, kind));
-  } catch (err) {
-    if (err instanceof LoginBlockedError) throw err;
-    say('Automatic login failed: log in by hand in the browser window.');
-    await dialog.username.waitFor({ state: 'hidden', timeout: 120_000 });
-  }
-  say('Logged in.');
-}
-
 async function main() {
   say(`Account: ${kind}. Recording for ${seconds}s into ${outDir}`);
-  const browser = await chromium.launch({ headless: false, channel: browserChannel() });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, locale: market.locale });
-  const page = await context.newPage();
+  await ensureLoggedIn(market, kind);
+  const browser = await connectLiveBrowser(kind);
+  const page = await browser.contexts()[0]!.newPage();
+  await page.setViewportSize({ width: 1280, height: 720 });
 
   page.on('request', (r) => log('network.log', `${r.method()} ${r.resourceType()} ${safeUrl(r.url())}`));
   page.on('requestfailed', (r) => log('network.log', `FAILED ${safeUrl(r.url())} ${r.failure()?.errorText ?? ''}`));
@@ -74,7 +63,6 @@ async function main() {
 
   await page.goto(new URL('/casino', market.baseUrl).toString());
   if (!(await new CookieBanner(page).rejectAllIfShown())) say('No cookie banner handled (reject it by hand if shown).');
-  await login(page);
   await page.goto(new URL(GAME_PATH, market.baseUrl).toString());
   say('Game page opened. Do not click Spin; just watch.');
 
@@ -91,7 +79,8 @@ async function main() {
   const frames = page.frames().map((f) => safeUrl(f.url()));
   writeFileSync(join(outDir, 'frames.txt'), frames.join('\n'));
   say(`Done. Results in ${outDir}`);
-  await browser.close();
+  await page.close();
+  await browser.close(); // disconnects only: the window and its session stay open
 }
 
 main().catch((err) => {

@@ -5,10 +5,10 @@ import { getProxy } from './src/config/env';
 import { activeMarkets, loadMarket } from './src/config/market';
 import type { MarketOptions } from './src/fixtures';
 
-const AUTH_SETUP = /auth\.setup\.ts/;
-
-// Per market: a "-setup" project that logs in (no trace/video, credentials are typed there) and
-// the scenario project, which depends on it and starts from the saved sessions.
+// Per market: a "-session" project, run on demand, that opens each account's browser window and
+// waits for a manual login if Betsson forgot it (npm run session:funded / session:empty), and the
+// scenario project. Scenarios do the same check themselves through the `page` fixture, so they do
+// not depend on the session project.
 const marketProjects: Project<MarketOptions>[] = activeMarkets().flatMap((id) => {
   const market = loadMarket(id);
   const use = {
@@ -23,16 +23,17 @@ const marketProjects: Project<MarketOptions>[] = activeMarkets().flatMap((id) =>
   };
   return [
     {
-      name: `${id}-setup`,
-      testDir: './tests/e2e',
-      testMatch: AUTH_SETUP,
-      use: { ...use, trace: 'off', video: 'off', screenshot: 'off' },
+      name: `${id}-session`,
+      testDir: './tests/setup',
+      testMatch: /.*\.setup\.ts/,
+      timeout: 15 * 60_000,
+      use: { marketId: id, trace: 'off', video: 'off', screenshot: 'off' },
     },
     {
+      // 1 worker, in file order: keep each account's tests together so the windows are switched
+      // as few times as possible.
       name: id,
       testDir: './tests/e2e',
-      testIgnore: AUTH_SETUP,
-      dependencies: [`${id}-setup`],
       use,
     },
   ];

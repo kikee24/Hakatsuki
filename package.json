@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "playwright test",
+    "test": "playwright test --project=unit --project=betsson-es",
     "test:unit": "playwright test --project=unit",
     "test:es": "playwright test --project=betsson-es",
+    "session:funded": "playwright test --project=betsson-es-session -g funded",
+    "session:empty": "playwright test --project=betsson-es-session -g empty",
     "report": "playwright show-report",
     "recon": "tsx tools/recon.ts"
   },

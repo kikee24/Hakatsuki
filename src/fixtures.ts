@@ -1,5 +1,4 @@
 import { test as base, expect } from '@playwright/test';
-import { storageStatePath } from './config/auth';
 import type { AccountKind } from './config/env';
 import { loadGame, type GameConfig } from './config/game';
 import { loadMarket, marketUi, type MarketConfig } from './config/market';
@@ -7,6 +6,8 @@ import { HudReader } from './game/hud-reader';
 import { BalanceMenu } from './pages/balance-menu';
 import { CookieBanner } from './pages/cookie-banner';
 import { GamePage } from './pages/game-page';
+import { ensureLoggedIn } from './session/ensure-session';
+import { connectLiveBrowser } from './session/live-browser';
 import { OcrEngine } from './vision/ocr';
 
 export interface MarketOptions {
@@ -31,9 +32,23 @@ export const test = base.extend<MarketOptions & Fixtures>({
   account: [null, { option: true }],
   gameId: ['wolf-gold', { option: true }],
 
-  // Start already logged in, from the session saved by tests/e2e/auth.setup.ts.
-  storageState: async ({ marketId, account }, use) => {
-    await use(account ? storageStatePath(marketId, account) : undefined);
+  // With an account, `page` is a new tab in that account's hand-logged-in window (src/session/):
+  // Betsson's bot protection blocks automated logins and the session cannot be copied to another
+  // browser. The other account's window is closed first (one account per device at a time).
+  // The tab is closed afterwards; the window and its session stay open for the next test.
+  page: async ({ page, account, market, viewport }, use) => {
+    if (!account) return use(page);
+    await ensureLoggedIn(market, account, 2 * 60_000);
+    const browser = await connectLiveBrowser(account);
+    const tab = await browser.contexts()[0]!.newPage();
+    try {
+      // Same geometry as the launched browser, so the calibrated game regions apply.
+      if (viewport) await tab.setViewportSize(viewport);
+      await use(tab);
+    } finally {
+      await tab.close().catch(() => undefined);
+      await browser.close(); // disconnects only
+    }
   },
 
   market: async ({ marketId }, use) => use(loadMarket(marketId)),

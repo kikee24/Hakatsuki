@@ -54,9 +54,10 @@ jobs:
     name: Scenarios · ${{ matrix.market }}
     needs: unit
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && vars.E2E_ON_PUSH == 'true') }}
-    # GitHub-hosted runners have US datacenter IPs, which Betsson may block. Set the repository
-    # variable E2E_RUNNER=self-hosted to run on a team laptop registered as a self-hosted runner.
-    runs-on: ${{ vars.E2E_RUNNER || 'ubuntu-latest' }}
+    # Runs on the team laptop registered as a self-hosted runner: the scenarios attach to the browser
+    # windows logged in by hand on that machine (npm run session:funded / session:empty), since
+    # Betsson blocks automated logins. Override the label with the repository variable E2E_RUNNER.
+    runs-on: ${{ vars.E2E_RUNNER || 'self-hosted' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -64,20 +65,8 @@ jobs:
         market: ${{ fromJSON(inputs.markets || '["betsson-es"]') }}
     env:
       MARKETS: ${{ matrix.market }}
-      BETSSON_ES_FUNDED_USERNAME: ${{ secrets.BETSSON_ES_FUNDED_USERNAME }}
-      BETSSON_ES_FUNDED_PASSWORD: ${{ secrets.BETSSON_ES_FUNDED_PASSWORD }}
-      BETSSON_ES_EMPTY_USERNAME: ${{ secrets.BETSSON_ES_EMPTY_USERNAME }}
-      BETSSON_ES_EMPTY_PASSWORD: ${{ secrets.BETSSON_ES_EMPTY_PASSWORD }}
       BETSSON_ES_PROXY_SERVER: ${{ secrets.BETSSON_ES_PROXY_SERVER }}
-      BETSSON_COM_FUNDED_USERNAME: ${{ secrets.BETSSON_COM_FUNDED_USERNAME }}
-      BETSSON_COM_FUNDED_PASSWORD: ${{ secrets.BETSSON_COM_FUNDED_PASSWORD }}
-      BETSSON_COM_EMPTY_USERNAME: ${{ secrets.BETSSON_COM_EMPTY_USERNAME }}
-      BETSSON_COM_EMPTY_PASSWORD: ${{ secrets.BETSSON_COM_EMPTY_PASSWORD }}
       BETSSON_COM_PROXY_SERVER: ${{ secrets.BETSSON_COM_PROXY_SERVER }}
-      BETSSON_PE_FUNDED_USERNAME: ${{ secrets.BETSSON_PE_FUNDED_USERNAME }}
-      BETSSON_PE_FUNDED_PASSWORD: ${{ secrets.BETSSON_PE_FUNDED_PASSWORD }}
-      BETSSON_PE_EMPTY_USERNAME: ${{ secrets.BETSSON_PE_EMPTY_USERNAME }}
-      BETSSON_PE_EMPTY_PASSWORD: ${{ secrets.BETSSON_PE_EMPTY_PASSWORD }}
       BETSSON_PE_PROXY_SERVER: ${{ secrets.BETSSON_PE_PROXY_SERVER }}
     steps:
       - uses: actions/checkout@v4
@@ -91,10 +80,14 @@ jobs:
         with:
           path: .cache/tesseract
           key: tesseract-${{ hashFiles('package-lock.json') }}
-      # Linux uses Playwright's Chromium; a Windows self-hosted runner uses the installed Chrome.
+      # Linux uses Playwright's Chromium; a Windows self-hosted runner uses the installed Chrome/Edge
+      # and only needs ffmpeg for the videos.
       - name: Install Chromium
         if: ${{ runner.os == 'Linux' }}
         run: npx playwright install --with-deps chromium
+      - name: Install ffmpeg
+        if: ${{ runner.os == 'Windows' }}
+        run: npx playwright install ffmpeg
       - name: Run both scenarios
         run: npx playwright test --project=${{ matrix.market }}
       - name: Upload blob report

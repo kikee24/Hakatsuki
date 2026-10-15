@@ -32,6 +32,7 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   );
 
   await test.step('Launch the Pragmatic Play game', () => gamePage.open());
+  await attachJson(testInfo, 'Game session (DGOJ)', gamePage.gameSessionPasses);
   const mode = await test.step('Enter Real Play', () => gamePage.ensureRealPlay());
   await attachJson(testInfo, 'Play mode', mode);
   await checks.verify(

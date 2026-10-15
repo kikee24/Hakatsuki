@@ -26,10 +26,23 @@ const MarketSchema = z.object({
       realModeLink: z.string(),
     })
     .optional(),
+  /**
+   * Regulated game session (Spain, DGOJ): time and loss limits must be set before Real Play.
+   * Absent for markets without it.
+   */
+  gameSession: z
+    .object({
+      timeLimitMinutes: z.number().int().positive(),
+      lossLimit: z.string().regex(/^\d+(,\d{1,2})?$/, 'amount in market format, e.g. "2,00"'),
+      // Label of the default "no self-exclusion" option, checked before submitting.
+      noExclusionLabel: z.string(),
+    })
+    .optional(),
 });
 
 export type MarketConfig = z.infer<typeof MarketSchema>;
 export type MarketUi = NonNullable<MarketConfig['ui']>;
+export type GameSessionConfig = NonNullable<MarketConfig['gameSession']>;
 
 export function marketUi(market: MarketConfig): MarketUi {
   if (!market.ui) throw new Error(`Market "${market.id}" has no "ui" texts in its config; explore the site first.`);
