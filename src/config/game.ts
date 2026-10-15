@@ -16,6 +16,8 @@ const GameTextsSchema = z.object({
   win: z.array(z.string()).min(1),
   idle: z.array(z.string()).min(1),
   spinning: z.array(z.string()).min(1),
+  /** Caption of the button that closes an in-game message. */
+  dismiss: z.array(z.string()).min(1),
 });
 
 const GameSchema = z.object({

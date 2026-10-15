@@ -46,6 +46,19 @@ export class BalanceMenu {
     return { withdrawable, bonus, evidence };
   }
 
+  /**
+   * The header may update a few seconds after the game settles. Re-reads until `done` holds or the
+   * timeout passes, and returns the last reading either way so the caller can report it.
+   */
+  async readUntil(done: (balance: BetssonBalance) => boolean, timeoutMs = 60_000, intervalMs = 5_000): Promise<BetssonBalance> {
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+      const balance = await this.read();
+      if (done(balance) || Date.now() > deadline) return balance;
+      await this.page.waitForTimeout(intervalMs);
+    }
+  }
+
   async close(): Promise<void> {
     await this.page.keyboard.press('Escape');
     if (await this.label(this.ui.withdrawableLabel).isVisible()) await this.toggle.click();

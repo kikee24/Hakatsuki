@@ -11,8 +11,11 @@ relying on the game's DOM.
 
 | Scenario | betsson.es (ES · EUR) | betsson.com (EN · EUR) | betsson.pe (ES · PEN) |
 |---|---|---|---|
-| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | planned | config ready | config ready |
-| 2. Insufficient balance — localized message, balances unchanged | planned | config ready | config ready |
+| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | written (`tests/e2e/spin-completed.spec.ts`), not yet run live | config ready | config ready |
+| 2. Insufficient balance — localized message, balances unchanged | written (`tests/e2e/insufficient-balance.spec.ts`), not yet run live | config ready | config ready |
+
+Every requirement is a numbered check (`S1-01`…`S1-11`, `S2-01`…`S2-08`) reported as its own
+step with the values that were compared, using soft assertions so one failure does not hide the rest.
 
 The test accounts we were given are on **betsson.es**, so it is the default market. The other
 markets are kept as configuration and can be enabled with `MARKETS=betsson-es,betsson-pe`.

@@ -43,3 +43,9 @@ export function fuzzyContains(text: string, phrase: string, maxErrorRatio = 0.2)
 export function findKeyword(text: string, keywords: readonly string[]): string | null {
   return keywords.find((k) => fuzzyContains(text, k)) ?? null;
 }
+
+/** A single OCR'd word equals one of `targets`, allowing one error per 5 letters ("credit0" ≈ "credito"). */
+export function matchesWord(word: string, targets: readonly string[]): boolean {
+  const clean = normalizeText(word).replace(/ /g, '');
+  return clean.length >= 2 && targets.some((t) => levenshtein(clean, t) <= Math.floor(t.length / 5));
+}

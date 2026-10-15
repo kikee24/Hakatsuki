@@ -1,7 +1,16 @@
 import type { Page } from '@playwright/test';
 import type { GameConfig, Region } from '../config/game';
 import { marketUi, type MarketConfig, type MarketUi } from '../config/market';
+import { findKeyword } from '../domain/text-match';
 import type { HudReader, HudSnapshot } from '../game/hud-reader';
+import type { OcrResult } from '../vision/ocr';
+
+export interface GameMessage {
+  frame: Buffer;
+  ocr: OcrResult;
+  /** Which expected keyword was recognised, or null if none appeared before the timeout. */
+  keyword: string | null;
+}
 
 export interface PlayMode {
   real: boolean;
@@ -97,6 +106,28 @@ export class GamePage {
         await this.clickRegion(this.game.regions.continueButton);
         lastIntroClick = Date.now();
       }
+      await this.page.waitForTimeout(1_000);
+    }
+  }
+
+  /** Reads the HUD until credit and bet are both visible, without clicking anything. */
+  async readHud(reader: HudReader, timeoutMs = 15_000): Promise<HudSnapshot> {
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+      const hud = await reader.read(await this.capture());
+      if ((hud.credit && hud.bet) || Date.now() > deadline) return hud;
+      await this.page.waitForTimeout(1_000);
+    }
+  }
+
+  /** Waits for an in-game pop-up whose text contains one of `keywords` (fuzzy, OCR-tolerant). */
+  async waitForMessage(reader: HudReader, keywords: readonly string[], timeoutMs = 15_000): Promise<GameMessage> {
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+      const frame = await this.capture();
+      const ocr = await reader.readMessage(frame);
+      const keyword = findKeyword(ocr.text, keywords);
+      if (keyword || Date.now() > deadline) return { frame, ocr, keyword };
       await this.page.waitForTimeout(1_000);
     }
   }

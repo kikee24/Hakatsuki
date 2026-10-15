@@ -8,24 +8,37 @@ import type { Region } from '../config/game';
 const REFERENCE_GAME_WIDTH = 1100;
 const UPSCALE = 3;
 
-export type Variant = 'threshold' | 'gray' | 'inverted';
+export type Variant = 'threshold' | 'gray' | 'inverted' | 'bright-threshold';
 
-/** Tried in this order. "threshold" won on every fixture; the others are fallbacks. */
-export const VARIANTS: readonly Variant[] = ['threshold', 'gray', 'inverted'];
+/**
+ * Tried in this order. "threshold" won on every HUD fixture; the others are fallbacks.
+ * "bright-threshold" keeps only near-white pixels: it separates white captions from coloured
+ * buttons (e.g. ACEPTAR on green), which the normal threshold merges into one blob.
+ */
+export const VARIANTS: readonly Variant[] = ['threshold', 'gray', 'inverted', 'bright-threshold'];
+
+export interface PixelBox {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** Pixel rectangle of a relative region inside an image of the given size. */
+export function regionToPixels(region: Region, width: number, height: number): PixelBox {
+  const left = Math.round(region.x * width);
+  const top = Math.round(region.y * height);
+  return {
+    left,
+    top,
+    width: Math.min(Math.round(region.w * width), width - left),
+    height: Math.min(Math.round(region.h * height), height - top),
+  };
+}
 
 export async function cropRegion(image: Buffer, region: Region): Promise<Buffer> {
   const { width = 0, height = 0 } = await sharp(image).metadata();
-  const left = Math.round(region.x * width);
-  const top = Math.round(region.y * height);
-  return sharp(image)
-    .extract({
-      left,
-      top,
-      width: Math.min(Math.round(region.w * width), width - left),
-      height: Math.min(Math.round(region.h * height), height - top),
-    })
-    .png()
-    .toBuffer();
+  return sharp(image).extract(regionToPixels(region, width, height)).png().toBuffer();
 }
 
 /** Crop a region and prepare it for OCR (light text on a busy background → dark text on white). */
@@ -37,6 +50,7 @@ export async function prepareForOcr(image: Buffer, region: Region, variant: Vari
 
   let pipeline = sharp(crop).resize({ width: Math.round(cropWidth * scale) }).grayscale().normalize();
   if (variant === 'threshold') pipeline = pipeline.threshold(150).negate();
+  if (variant === 'bright-threshold') pipeline = pipeline.threshold(215).negate();
   if (variant === 'inverted') pipeline = pipeline.negate();
   return pipeline.png().toBuffer();
 }

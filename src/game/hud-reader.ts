@@ -1,5 +1,5 @@
 import { gameTexts, type GameConfig, type GameTexts, type Region } from '../config/game';
-import type { OcrEngine, OcrResult } from '../vision/ocr';
+import type { OcrEngine, OcrResult, TextLocation } from '../vision/ocr';
 import { readMoneyBlock, readStatusLine, type HudReading } from './hud';
 
 export interface HudSnapshot extends HudReading {
@@ -39,5 +39,10 @@ export class HudReader {
   /** Text of a pop-up message (e.g. insufficient funds). Defaults to the game's message area. */
   async readMessage(gameImage: Buffer, region: Region = this.game.regions.message): Promise<OcrResult> {
     return this.ocr.readRegion(gameImage, region, (text) => text.replace(/\W/g, '').length > 10);
+  }
+
+  /** Locates the button that closes a pop-up by reading its caption ("ACEPTAR"). */
+  async findDismissButton(gameImage: Buffer, region: Region = this.game.regions.message): Promise<TextLocation | null> {
+    return this.ocr.findText(gameImage, region, this.texts.dismiss);
   }
 }

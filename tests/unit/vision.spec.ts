@@ -57,4 +57,16 @@ test.describe('vision on Wolf Gold screenshots', () => {
       expect(findKeyword(result.text, loadMarket('betsson-com').insufficientFundsKeywords)).toBeNull();
     });
   }
+
+  test('locates the ACEPTAR button by reading its caption', async () => {
+    const image = readFileSync(join(SCREENS_DIR, 'wolf-gold-insufficient-funds.png'));
+    const button = await reader.findDismissButton(image, FULL_FRAME);
+    expect(button, 'ACEPTAR caption found').not.toBeNull();
+    const centreX = button!.region.x + button!.region.w / 2;
+    const centreY = button!.region.y + button!.region.h / 2;
+    // In the screenshot the green ACEPTAR button spans the bottom of the pop-up, centred.
+    expect(centreX).toBeGreaterThan(0.35);
+    expect(centreX).toBeLessThan(0.65);
+    expect(centreY).toBeGreaterThan(0.75);
+  });
 });

@@ -18,14 +18,16 @@
       "bet": ["apuesta"],
       "win": ["ganancia"],
       "idle": ["haga su apuesta"],
-      "spinning": ["buena suerte"]
+      "spinning": ["buena suerte"],
+      "dismiss": ["aceptar"]
     },
     "en": {
       "credit": ["credit"],
       "bet": ["bet"],
       "win": ["win"],
       "idle": ["place your bets"],
-      "spinning": ["good luck"]
+      "spinning": ["good luck"],
+      "dismiss": ["ok"]
     }
   }
 }
