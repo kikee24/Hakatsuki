@@ -240,6 +240,11 @@ export class GamePage {
       await this.clickRegion(this.game.regions.betDown);
       await this.page.waitForTimeout(400);
       hud = await reader.read(await this.capture());
+      // The bet going up means the press hit another control (e.g. "+"): stop before spinning
+      // anything, whatever region (configured or found on screen) was used.
+      if (before !== undefined && hud.bet && hud.bet.cents > before) {
+        throw new Error(`The bet went up (${before} → ${hud.bet.cents} cents) when pressing "−": wrong button, not spinning.`);
+      }
       if (hud.bet?.cents === before) break;
     }
     if (!hud.bet) throw new Error('Bet is not readable after lowering it.');
