@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import type { MarketUi } from '../config/market';
+import { balanceUpdateDecision, type BalanceUpdateDecision } from '../domain/balance-update';
 import { parseMoney, type Money } from '../domain/money';
 
 export interface BetssonBalance {
@@ -59,14 +60,26 @@ export class BalanceMenu {
   }
 
   /**
-   * The header may update a few seconds after the game settles. Re-reads until `done` holds or the
-   * timeout passes, and returns the last reading either way so the caller can report it.
+   * Balance after a spin. The header may lag behind the game, so it re-reads until it shows the
+   * predicted value, or until it has moved away from `beforeCents` and settled on another value
+   * (then the prediction is off and waiting longer would not help: see balanceUpdateDecision), or
+   * until the timeout. Returns the last reading either way, with how it ended.
    */
-  async readUntil(done: (balance: BetssonBalance) => boolean, timeoutMs = 60_000, intervalMs = 5_000): Promise<BetssonBalance> {
+  async readAfterSpin(
+    beforeCents: number,
+    expectedCents: number,
+    timeoutMs = 60_000,
+    intervalMs = 3_000,
+  ): Promise<{ balance: BetssonBalance; reads: number; ended: BalanceUpdateDecision | 'timeout' }> {
     const deadline = Date.now() + timeoutMs;
-    for (;;) {
+    let previousCents: number | null = null;
+    for (let reads = 1; ; reads++) {
       const balance = await this.read();
-      if (done(balance) || Date.now() > deadline) return balance;
+      const currentCents = balance.withdrawable.cents;
+      const decision = balanceUpdateDecision({ beforeCents, expectedCents, currentCents, previousCents });
+      if (decision !== 'wait') return { balance, reads, ended: decision };
+      if (Date.now() > deadline) return { balance, reads, ended: 'timeout' };
+      previousCents = currentCents;
       await this.page.waitForTimeout(intervalMs);
     }
   }

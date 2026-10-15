@@ -119,9 +119,11 @@ test(SCENARIOS.spinCompleted.title, async ({ page, market, game, cookies, balanc
   await checks.verify(C.inGameRule, () => expect.soft(inGame.ok).toBe(true), rule(inGame));
 
   const expectedBetsson = betssonBefore.withdrawable.cents - bet.cents + outcome.payoutCents;
-  const betssonAfter = await test.step('Read the Betsson balance after the spin', () =>
-    balanceMenu.readUntil((b) => b.withdrawable.cents === expectedBetsson),
+  const afterRead = await test.step('Read the Betsson balance after the spin', () =>
+    balanceMenu.readAfterSpin(betssonBefore.withdrawable.cents, expectedBetsson),
   );
+  const betssonAfter = afterRead.balance;
+  testInfo.annotations.push({ type: 'betsson-balance-after', description: `${afterRead.reads} read(s), ended: ${afterRead.ended}` });
   await attachPng(testInfo, 'Betsson balance after', betssonAfter.evidence);
   const betsson = reconcileBalance({
     beforeCents: betssonBefore.withdrawable.cents,
