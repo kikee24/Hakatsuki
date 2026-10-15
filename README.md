@@ -116,7 +116,7 @@ the form showed is attached to the report as *Game session (DGOJ)*.
 ```bash
 npm run test:unit      # domain logic and OCR on fixtures, no browser
 npm run test:es        # run both scenarios on betsson.es in the hand-logged-in windows
-npm run report         # open the Playwright HTML report
+npm run report         # open the results dashboard of the last run
 ```
 
 `npm run export:results` copies the last run (scenario and unit results, check matrix and every
@@ -124,9 +124,25 @@ attachment as a file, traces left out) to `results-export/<timestamp>/`, to shar
 dashboard on it: see [docs/panel-de-control.md](docs/panel-de-control.md). Unit-only runs write their
 own report (`playwright-report-unit/`, `npm run report:unit`) and never replace a scenario run's.
 
-After a scenario run, `check-matrix/index.html` shows every check (rows) per market (columns) as
-pass / fail / not run, with the compared values. The Playwright report holds the evidence: game
-frames per spin phase, reel-motion diffs, the exact OCR inputs and text, traces and videos.
+### Results dashboard
+
+When a run ends, `dashboard/index.html` is written (`npm run report` opens it). For each scenario
+and market it lists every check (`S1-01`…`S2-08`) as PASS / FAIL / not run, what it verifies and how,
+and the values it saw (e.g. `98,55 € − 0,25 € + 0,05 € = 98,35 €; seen 98,35 €`), with the
+screenshots that back it. Each test also shows its video, its key frames per spin phase (playable in
+order), the full screenshot gallery (Betsson balance, HUD and OCR crops, pop-up), the OCR text and
+JSON it read, and its steps. The unit tests are listed by file at the end.
+
+- The hand-logged-in tab is recorded with Playwright's screencast (needs `npx playwright install ffmpeg`;
+  `RECORD_LIVE=0` turns it off). Recording pauses while the Betsson balance menu is open, because it
+  shows the player's name, so a scenario has a video in parts.
+- Traces are never copied into the dashboard (they hold the session's cookies); open them locally
+  with `npm run report:playwright`.
+- `npm run report -- results-export/<timestamp>` or `npm run report -- docs/panel-sample` builds it
+  from an exported run into `dashboard-export/`.
+
+`check-matrix/index.html` still holds the bare check × market matrix, and `npm run report:playwright`
+the full Playwright report.
 
 ## GitHub Actions
 
@@ -136,13 +152,16 @@ Workflow: `.github/workflows/game-validation.yml`.
 |---|---|---|
 | Unit and vision tests | every push and pull request | typecheck + `--project=unit` (no account, no browser) |
 | Scenarios · *market* | manual (*Actions → Game validation → Run workflow*) | both scenarios, one matrix job per market |
-| Publish report | after the scenarios | merges all markets into one report and writes the check matrix to the job summary |
+| Publish report | after the scenarios | merges the unit and market results into the dashboard, writes the check matrix to the job summary and publishes the dashboard to GitHub Pages |
 
 The scenarios are manual on purpose: each run spends the minimum bet. They run on the team laptop
 (self-hosted runner) because they need its hand-logged-in browser windows.
 
-**Report artifact** `game-validation-report`: `index.html` is the check matrix,
-`playwright-report/` the full evidence. The matrix also appears on the run's summary page.
+**Published dashboard**: every scenario run deploys the dashboard to the repository's GitHub Pages
+site and links it from the run's summary page. One-time setup: *Settings → Pages → Source: GitHub
+Actions* (Pages on a private repository needs a paid plan). The same site is kept as the run artifact
+`game-validation-report`: `index.html` is the dashboard, `check-matrix/` the matrix and
+`playwright-report/` the full Playwright report.
 
 ### Repository secrets (*Settings → Secrets and variables → Actions → Secrets*)
 
@@ -154,7 +173,7 @@ No account credentials. Optionally `BETSSON_ES_PROXY_SERVER` (same with `COM` / 
 |---|---|
 | `E2E_RUNNER` | Runner label for the scenarios. Default `self-hosted` (the team laptop with the logged-in windows) |
 | `E2E_ON_PUSH` | `true` also runs the scenarios on every push to `main` |
-| `PUBLISH_PAGES` | `true` also publishes the report to GitHub Pages (enable Pages with source *GitHub Actions* first) |
+| `PUBLISH_PAGES` | `false` keeps the dashboard as a run artifact only, without deploying it to GitHub Pages |
 
 A self-hosted runner is registered from *Settings → Actions → Runners → New self-hosted runner*.
 Run it interactively (`run.cmd`, not as a Windows service) so it can reach the browser windows,

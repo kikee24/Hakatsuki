@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import type { MarketUi } from '../config/market';
 import { balanceUpdateDecision, type BalanceUpdateDecision } from '../domain/balance-update';
 import { parseMoney, type Money } from '../domain/money';
+import { offRecord } from '../evidence/live-recorder';
 
 export interface BetssonBalance {
   /** "Disponible para retirar": real money the player can use. Used for the balance rule. */
@@ -36,7 +37,12 @@ export class BalanceMenu {
     return this.page.getByText(text, { exact: true }).first();
   }
 
-  async read(): Promise<BetssonBalance> {
+  /** Not on the test's video: the open menu shows the player's name. */
+  read(): Promise<BetssonBalance> {
+    return offRecord(this.page, () => this.readOpen());
+  }
+
+  private async readOpen(): Promise<BetssonBalance> {
     // Bounded waits: without them a missing element only fails at the 3-minute test timeout.
     await this.toggle.click({ timeout: 15_000 }).catch((e: unknown) => {
       throw new Error(`Header balance button not found (logged out?): ${e instanceof Error ? e.message.split('\n')[0] : e}`);
