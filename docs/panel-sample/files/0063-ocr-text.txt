@@ -1,8 +1,0 @@
-ini
-MENSAJE Xx
-|
-. Fondos insuficientes para realizar esta
-— apuesta. Haga un depósito en su cuenta
-
-o reduzca el nivel de la apuesta.
-PU

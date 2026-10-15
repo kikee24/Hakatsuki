@@ -90,8 +90,9 @@ the values it compared (e.g. `98,55 € − 0,25 € + 0,05 € = 98,35 €; see
 screenshots, key frames and video that back it, plus all the unit tests. See
 [Results dashboard](#results-dashboard).
 
-No account at hand? `npm run report -- docs/panel-sample` opens a reviewed real run (15 Oct, 19/19
-checks passed) committed to the repository.
+The dashboard and its evidence stay on your machine (`dashboard/` is gitignored): they show the real
+accounts' screens, so no run is committed to the repository. Run the tests first; until then
+`npm run report` has nothing to show.
 
 ### If something goes wrong
 
@@ -229,8 +230,10 @@ listed by file at the end.
   shows the player's name, so a scenario has a video in parts.
 - Traces are never copied into the dashboard (they hold the session's cookies); open them locally
   with `npm run report:playwright`.
-- `npm run report -- results-export/<timestamp>` or `npm run report -- docs/panel-sample` builds it
-  from an exported run into `dashboard-export/`.
+- `npm run report -- results-export/<timestamp>` builds it from an exported run into
+  `dashboard-export/`.
+- Everything is local: `dashboard/`, `results-export/` and `dashboard-export/` are gitignored, and CI
+  publishes the dashboard on GitHub Pages only if the repository variable `PUBLISH_PAGES` is `true`.
 
 `check-matrix/index.html` still holds the bare check × market matrix, and `npm run report:playwright`
 the full Playwright report.
@@ -282,16 +285,16 @@ Workflow: `.github/workflows/game-validation.yml`.
 |---|---|---|
 | Unit and vision tests | every push and pull request | typecheck + `--project=unit` (no account, no browser) |
 | Scenarios · *market* | manual (*Actions → Game validation → Run workflow*) | both scenarios, one matrix job per market |
-| Publish report | after the scenarios | merges the unit and market results into the dashboard, writes the check matrix to the job summary and publishes the dashboard to GitHub Pages |
+| Publish report | after the scenarios | merges the unit and market results into the dashboard, writes the check matrix to the job summary and keeps the dashboard as a run artifact (GitHub Pages only with `PUBLISH_PAGES=true`) |
 
 The scenarios are manual on purpose: each run spends the minimum bet. They run on the team laptop
 (self-hosted runner) because they need its hand-logged-in browser windows.
 
-**Published dashboard**: every scenario run deploys the dashboard to the repository's GitHub Pages
-site and links it from the run's summary page. One-time setup: *Settings → Pages → Source: GitHub
-Actions* (Pages on a private repository needs a paid plan). The same site is kept as the run artifact
+**Dashboard in CI**: each scenario run keeps the dashboard as the private run artifact
 `game-validation-report`: `index.html` is the dashboard, `check-matrix/` the matrix and
-`playwright-report/` the full Playwright report.
+`playwright-report/` the full Playwright report. It is not published by default, because it shows
+the real accounts' screens. To deploy it to GitHub Pages as well, set `PUBLISH_PAGES=true` and
+*Settings → Pages → Source: GitHub Actions* once (Pages on a private repository needs a paid plan).
 
 **Secrets** (*Settings → Secrets and variables → Actions*): no account credentials. Optionally
 `BETSSON_ES_PROXY_SERVER`.
@@ -302,7 +305,7 @@ Actions* (Pages on a private repository needs a paid plan). The same site is kep
 |---|---|
 | `E2E_RUNNER` | Runner label for the scenarios. Default `self-hosted` (the team laptop with the logged-in windows) |
 | `E2E_ON_PUSH` | `true` also runs the scenarios on every push to `main` |
-| `PUBLISH_PAGES` | `false` keeps the dashboard as a run artifact only, without deploying it to GitHub Pages |
+| `PUBLISH_PAGES` | `true` also deploys the dashboard to GitHub Pages. Default: run artifact only |
 
 A self-hosted runner is registered from *Settings → Actions → Runners → New self-hosted runner*.
 Run it interactively (`run.cmd`, not as a Windows service) so it can reach the browser windows,

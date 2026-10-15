@@ -1,5 +1,0 @@
-money [gray]:
-“e ——
-
-status [threshold]:
-— SI

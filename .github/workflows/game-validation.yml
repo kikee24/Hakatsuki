@@ -137,17 +137,18 @@ jobs:
           path: site/
           retention-days: 30
       - name: Prepare GitHub Pages artifact
-        if: ${{ vars.PUBLISH_PAGES != 'false' }}
+        if: ${{ vars.PUBLISH_PAGES == 'true' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/
 
-  # Publishes the dashboard on every scenario run. Needs Settings → Pages → Source: GitHub Actions
-  # (once). Set the repository variable PUBLISH_PAGES=false to keep it as a run artifact only.
+  # Off by default: the dashboard shows the real accounts' screens, so it stays a private run
+  # artifact. Set the repository variable PUBLISH_PAGES=true (and Settings → Pages → Source: GitHub
+  # Actions, once) to publish it on GitHub Pages.
   pages:
     name: Publish dashboard to GitHub Pages
     needs: report
-    if: ${{ !cancelled() && needs.report.result == 'success' && vars.PUBLISH_PAGES != 'false' }}
+    if: ${{ !cancelled() && needs.report.result == 'success' && vars.PUBLISH_PAGES == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
