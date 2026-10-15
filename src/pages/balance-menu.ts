@@ -20,8 +20,15 @@ export class BalanceMenu {
     private readonly ui: MarketUi,
   ) {}
 
+  /**
+   * The header balance button. In the lobby it shows the amount ("98,90 €"), on the game page it
+   * reads "Saldo", so it is found by its test id first and by that caption as a fallback.
+   */
   private get toggle() {
-    return this.page.getByRole('button', { name: this.ui.balanceButton }).first();
+    return this.page
+      .locator('[data-test-id="balance-button"]')
+      .or(this.page.getByRole('button', { name: this.ui.balanceButton }))
+      .first();
   }
 
   private label(text: string) {
@@ -29,9 +36,14 @@ export class BalanceMenu {
   }
 
   async read(): Promise<BetssonBalance> {
-    await this.toggle.click();
+    // Bounded waits: without them a missing element only fails at the 3-minute test timeout.
+    await this.toggle.click({ timeout: 15_000 }).catch((e: unknown) => {
+      throw new Error(`Header balance button not found (logged out?): ${e instanceof Error ? e.message.split('\n')[0] : e}`);
+    });
     const withdrawableLabel = this.label(this.ui.withdrawableLabel);
-    await withdrawableLabel.waitFor({ state: 'visible' });
+    await withdrawableLabel.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {
+      throw new Error(`Balance menu opened but "${this.ui.withdrawableLabel}" did not show up.`);
+    });
 
     const withdrawableRow = await this.rowWithAmount(withdrawableLabel);
     const bonusLabel = this.label(this.ui.bonusLabel);

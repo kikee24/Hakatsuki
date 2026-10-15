@@ -62,14 +62,14 @@ export class GameSessionGate {
     await this.timeOption(timeLimitMinutes).click();
     const lossLimitSet = await this.lossLimit.isVisible();
     if (lossLimitSet) await this.lossLimit.fill(lossLimit);
-    const shownText = ((await this.form.innerText().catch(() => '')) ?? '').trim();
+    const shownText = await visibleText(this.form);
     // Self-exclusion blocks play for the chosen period and cannot be undone: refuse to submit
     // unless it is still on its default.
     await expect(this.exclusion, 'self-exclusion must stay on its default').toHaveValue(noExclusionLabel);
     // A disabled submit (invalid limits) would make click() wait forever.
     if (await this.submit.isEnabled()) await this.submit.click({ timeout: 5_000 }).catch(() => undefined);
     const accepted = await this.form.waitFor({ state: 'hidden', timeout: 15_000 }).then(() => true, () => false);
-    const formText = accepted ? '' : ((await this.form.innerText().catch(() => '')) ?? '').trim();
+    const formText = accepted ? '' : await visibleText(this.form);
     return { accepted, lossLimitSet, shownText, formText };
   }
 
@@ -77,4 +77,24 @@ export class GameSessionGate {
     const { accepted, formText } = await this.tryStart();
     if (!accepted) throw new Error(`Betsson did not accept the game session limits. Form says: ${formText.slice(0, 300)}`);
   }
+}
+
+/** Text of an element including its open shadow roots (innerText skips them), for evidence. */
+async function visibleText(locator: Locator): Promise<string> {
+  return locator
+    .evaluate((root) => {
+      const parts: string[] = [];
+      const walk = (node: Node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent?.trim();
+          if (text) parts.push(text);
+          return;
+        }
+        if (node instanceof Element && node.shadowRoot) node.shadowRoot.childNodes.forEach(walk);
+        node.childNodes.forEach(walk);
+      };
+      walk(root);
+      return parts.join(' ');
+    })
+    .catch(() => '');
 }
