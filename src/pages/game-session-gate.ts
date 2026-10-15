@@ -1,6 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import type { GameSessionConfig } from '../config/market';
 
+// A gate button covered by another dialog: stop trying after this and look at the screen again.
+const CLICK_TIMEOUT_MS = 2_000;
+// After a click went through, the next screen (notice or form) gets at least this long to show.
+const FORM_AFTER_CLICK_MS = 15_000;
+
 /**
  * Betsson's regulated "sesión de juego" (DGOJ, Orden HAP/1370/2014 art. 14), shown in the operator's
  * DOM before the game iframe can start in Real Play. Possible screens, in any order:
@@ -31,13 +36,23 @@ export class GameSessionGate {
     return this.page.locator(`[data-test-id="session-settings_time-limit-option-${minutes * 60}"] button`);
   }
 
-  /** Clicks through the blocked screen and the cool-down notice until the limits form shows. */
+  /**
+   * Clicks through the blocked screen and the cool-down notice until the limits form shows.
+   * Betsson often opens the notice as a dialog over the blocked screen a moment after it: a click
+   * on the button behind it is intercepted, and Playwright would keep scrolling and retrying until
+   * the dialog goes. So each click gives up after a moment and the screen is looked at again, and
+   * the time to wait counts from the last click that went through.
+   */
   async openForm(timeoutMs = 30_000): Promise<void> {
-    const deadline = Date.now() + timeoutMs;
+    let deadline = Date.now() + timeoutMs;
+    const press = async (button: Locator) => {
+      const clicked = await button.click({ timeout: CLICK_TIMEOUT_MS }).then(() => true, () => false);
+      if (clicked) deadline = Math.max(deadline, Date.now() + FORM_AFTER_CLICK_MS);
+    };
     while (Date.now() < deadline) {
       if (await this.form.isVisible()) return;
-      if (await this.coolDownContinue.isVisible()) await this.coolDownContinue.click();
-      else if (await this.startNewSession.isVisible()) await this.startNewSession.click();
+      if (await this.coolDownContinue.isVisible()) await press(this.coolDownContinue);
+      else if (await this.startNewSession.isVisible()) await press(this.startNewSession);
       await this.page.waitForTimeout(500);
     }
     throw new Error('The DGOJ session limits form did not show up.');
