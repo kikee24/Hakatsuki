@@ -69,3 +69,11 @@ test.describe('win total when OCR lost the GANANCIA label', () => {
     expect(readStatusLine('15 €\nLA LINEA 11 ABONA 0,15 €', es).win).toBeNull();
   });
 });
+
+test('a decimal comma read as "/" is still the comma (live Bubble Up OCR: "CREDITO 89/90€")', () => {
+  expect(readMoneyBlock('CREDITO 89/90€ Le\n* APUESTA 0,20 €', es)).toEqual({
+    credit: { cents: 8990, currency: 'EUR' },
+    bet: { cents: 20, currency: 'EUR' },
+  });
+  expect(amountAfterLabel('CRÉDITO 1.234;56 €', es.credit)?.cents).toBe(123456);
+});

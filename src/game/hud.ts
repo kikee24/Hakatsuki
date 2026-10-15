@@ -26,7 +26,9 @@ export function amountAfterLabel(text: string, labels: readonly string[]): Money
     const line = stripAccents(rawLine);
     for (const word of line.matchAll(/\S+/g)) {
       if (word[0].length < 3 || !matchesWord(word[0], labels)) continue;
-      const rest = line.slice(word.index + word[0].length);
+      // OCR sometimes reads the decimal comma as "/", ";", ":" or "'" (live, Bubble Up:
+      // "CREDITO 89/90€"): between digits and followed by exactly two, it can only be the comma.
+      const rest = line.slice(word.index + word[0].length).replace(/(\d)\s*[/;:']\s*(\d{2})(?!\d)/g, '$1,$2');
       const digits = rest.match(/\d[\d.,\s]*\d|\d/)?.[0].replace(/\s/g, '');
       if (!digits || !/[.,]\d{2}$/.test(digits)) continue;
       const money = parseMoney(rest);

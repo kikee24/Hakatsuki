@@ -53,5 +53,11 @@
       "gameBox": { "left": 112, "top": 285, "width": 814, "height": 459 },
       "expected": { "bonusActive": false, "asksToContinue": false }
     }
+  ],
+  "frames": [
+    {
+      "file": "bubble-up-real-win.png",
+      "gameBox": { "left": 0, "top": 0, "width": 772, "height": 434 }
+    }
   ]
 }
