@@ -9,7 +9,7 @@ const MarketSchema = z.object({
   baseUrl: z.string().url(),
   lobbyPath: z.string().startsWith('/'),
   locale: z.string(),
-  language: z.enum(['en', 'es']),
+  language: z.enum(['es']),
   ocrLanguage: z.string(),
   currency: z.enum(Object.keys(CURRENCIES) as [keyof typeof CURRENCIES, ...(keyof typeof CURRENCIES)[]]),
   envPrefix: z.string().regex(/^[A-Z0-9_]+$/),
@@ -18,12 +18,13 @@ const MarketSchema = z.object({
 
 export type MarketConfig = z.infer<typeof MarketSchema>;
 
-export const MARKET_IDS = ['betsson-es', 'betsson-com', 'betsson-pe'] as const;
+// Single market by the organizer's decision (15/10). Adding a market = one JSON in config/markets/ + its id here.
+export const MARKET_IDS = ['betsson-es'] as const;
 export type MarketId = (typeof MARKET_IDS)[number];
 
 const DEFAULT_MARKETS: MarketId[] = ['betsson-es'];
 
-/** Markets to run, from MARKETS="betsson-es,betsson-pe". Defaults to the market we have accounts for. */
+/** Markets to run, from MARKETS="betsson-es". Defaults to betsson.es. */
 export function activeMarkets(value = process.env.MARKETS): MarketId[] {
   const requested = value?.split(',').map((m) => m.trim()).filter(Boolean);
   if (!requested?.length) return DEFAULT_MARKETS;

@@ -27,12 +27,13 @@ test.describe('fuzzy text matching', () => {
   });
 
   test('does not match unrelated text', () => {
-    expect(fuzzyContains('GOOD LUCK! PLACE YOUR BETS', 'insufficient funds')).toBe(false);
+    expect(fuzzyContains('¡BUENA SUERTE! HAZ TU APUESTA', 'saldo insuficiente')).toBe(false);
   });
 
-  test('English keywords do not match a Spanish message', () => {
-    const en = loadMarket('betsson-com');
-    expect(findKeyword('Saldo insuficiente', en.insufficientFundsKeywords)).toBeNull();
+  test('betsson.es keywords match the Spanish insufficient-balance message', () => {
+    const es = loadMarket('betsson-es');
+    expect(findKeyword('No tienes suficiente saldo para esta apuesta', es.insufficientFundsKeywords)).not.toBeNull();
+    expect(findKeyword('¡BUENA SUERTE!', es.insufficientFundsKeywords)).toBeNull();
   });
 });
 
@@ -45,11 +46,11 @@ test.describe('activeMarkets', () => {
     expect(activeMarkets(undefined)).toEqual(['betsson-es']);
   });
 
-  test('reads a comma-separated list', () => {
-    expect(activeMarkets('betsson-es, betsson-pe')).toEqual(['betsson-es', 'betsson-pe']);
+  test('reads the MARKETS list', () => {
+    expect(activeMarkets(' betsson-es ')).toEqual(['betsson-es']);
   });
 
-  test('rejects unknown markets', () => {
-    expect(() => activeMarkets('betsson-xx')).toThrow(/Unknown market/);
+  test('rejects markets out of scope', () => {
+    expect(() => activeMarkets('betsson-es,betsson-pe')).toThrow(/Unknown market/);
   });
 });

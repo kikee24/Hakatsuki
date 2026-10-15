@@ -7,15 +7,18 @@ cross-origin iframe rendered on a canvas, so the checker validates **what the pl
 OCR on the game HUD, motion detection on the reels and template matching on controls, instead of
 relying on the game's DOM.
 
-## Scenarios × markets
+## Market
 
-| Scenario | betsson.es (ES · EUR) | betsson.com (EN · EUR) | betsson.pe (ES · PEN) |
-|---|---|---|---|
-| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | planned | config ready | config ready |
-| 2. Insufficient balance — localized message, balances unchanged | planned | config ready | config ready |
+> **Mercado único betsson.es por indicación del organizador (15/10).**
 
-The test accounts we were given are on **betsson.es**, so it is the default market. The other
-markets are kept as configuration and can be enabled with `MARKETS=betsson-es,betsson-pe`.
+The organizer replaced betsson.com and betsson.pe with **betsson.es** only: Spanish UI, EUR,
+amounts formatted as `1.234,56 €`. The market abstraction is kept (`config/markets/betsson-es.json`,
+`MARKETS=betsson-es`), so another market is one config file away.
+
+| Scenario | betsson.es (ES · EUR) |
+|---|---|
+| 1. Completed Real Play spin — `balance_after = balance_before − wager + payout` | planned |
+| 2. Insufficient balance — Spanish message, balances unchanged | planned |
 
 ## Project layout
 

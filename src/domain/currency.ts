@@ -1,9 +1,8 @@
 /**
- * Ways each currency can appear on screen. Longer markers first so "S/." wins over "S/".
+ * Ways each currency can appear on screen. Longer markers first.
  */
 export const CURRENCIES = {
   EUR: { markers: ['EUR', '€'] },
-  PEN: { markers: ['PEN', 'S/.', 'S/'] },
 } as const;
 
 export type CurrencyCode = keyof typeof CURRENCIES;

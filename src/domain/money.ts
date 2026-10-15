@@ -9,7 +9,7 @@ export interface Money {
 const AMOUNT = /\d[\d.,\s]*\d|\d/;
 
 /**
- * Parses an on-screen amount such as "€1,234.56", "S/ 12.50", "1.234,56 €" or "CREDIT EUR 99.80".
+ * Parses an on-screen amount such as "1.234,56 €", "CRÉDITO 99,80 €", "APUESTA 0,20 €" or "€1,234.56".
  * The decimal separator is inferred: the last "." or "," followed by 1-2 digits at the end of the
  * number. Every other separator is treated as a thousands separator.
  */
