@@ -19,6 +19,16 @@
       "file": "wolf-gold-intro.webp",
       "gameBox": { "left": 210, "top": 173, "width": 1100, "height": 622 },
       "expected": { "creditCents": null, "betCents": null, "winCents": null, "status": "unknown" }
+    },
+    {
+      "file": "bubble-up-real-idle.webp",
+      "gameBox": { "left": 0, "top": 0, "width": 772, "height": 434 },
+      "expected": { "creditCents": 0, "betCents": 200, "winCents": null, "status": "idle" }
+    },
+    {
+      "file": "bubble-up-intro.webp",
+      "gameBox": { "left": 59, "top": 105, "width": 482, "height": 272 },
+      "expected": { "creditCents": null, "betCents": null, "winCents": null, "status": "unknown" }
     }
   ],
   "messages": [
