@@ -30,7 +30,9 @@ interface Fixtures {
 export const test = base.extend<MarketOptions & Fixtures>({
   marketId: ['betsson-es', { option: true }],
   account: [null, { option: true }],
-  gameId: ['wolf-gold', { option: true }],
+  // Select the game from the command line with GAME_ID=sweet-bonanza.
+  // Keeping wolf-gold as the default preserves the existing commands.
+  gameId: [process.env.GAME_ID?.trim() || 'wolf-gold', { option: true }],
 
   // With an account, `page` is a new tab in that account's hand-logged-in window (src/session/):
   // Betsson's bot protection blocks automated logins and the session cannot be copied to another
